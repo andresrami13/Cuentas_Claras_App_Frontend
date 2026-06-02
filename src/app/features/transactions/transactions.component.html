@@ -1,0 +1,346 @@
+<div class="p-4 md:p-6 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl md:text-2xl font-bold text-[#1C2833]">Hola, {{ getFirstName() }} 👋</h1>
+      <p class="text-sm text-gray-500 mt-0.5">Resumen de tus movimientos</p>
+    </div>
+    <button
+      (click)="openAddForm()"
+      class="hidden md:flex items-center gap-2 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-[#F0C040] transition-colors shadow-sm"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nuevo movimiento
+    </button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    <!-- Income -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-[#28B463]/10 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#28B463]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+          </svg>
+        </div>
+        <span class="text-xs text-gray-500 font-medium hidden sm:block">Ingresos</span>
+      </div>
+      <p class="text-[#28B463] font-bold text-base md:text-lg leading-tight">
+        {{ formatCurrency(totalIncome()) }}
+      </p>
+      <p class="text-xs text-gray-400 mt-0.5 sm:hidden">Ingresos</p>
+    </div>
+
+    <!-- Expenses -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-[#CB4335]/10 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#CB4335]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </div>
+        <span class="text-xs text-gray-500 font-medium hidden sm:block">Egresos</span>
+      </div>
+      <p class="text-[#CB4335] font-bold text-base md:text-lg leading-tight">
+        {{ formatCurrency(totalExpenses()) }}
+      </p>
+      <p class="text-xs text-gray-400 mt-0.5 sm:hidden">Egresos</p>
+    </div>
+
+    <!-- Balance -->
+    <div class="bg-[#1C2833] rounded-2xl p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-lg bg-[#D4A017]/20 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#D4A017]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+          </svg>
+        </div>
+        <span class="text-xs text-white/60 font-medium hidden sm:block">Balance</span>
+      </div>
+      <p class="font-bold text-base md:text-lg leading-tight"
+        [class.text-[#D4A017]]="balance() >= 0"
+        [class.text-[#CB4335]]="balance() < 0">
+        {{ formatCurrency(balance()) }}
+      </p>
+      <p class="text-xs text-white/40 mt-0.5 sm:hidden">Balance</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-4">
+    <button
+      (click)="showFilters.update(v => !v)"
+      class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700"
+    >
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+        </svg>
+        Filtros
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 transition-transform"
+        [class.rotate-180]="showFilters()"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+
+    @if (showFilters()) {
+      <div class="px-4 pb-4 border-t border-gray-100 pt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Tipo</label>
+          <select [(ngModel)]="filter.type"
+            class="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none">
+            <option value="all">Todos</option>
+            <option value="income">Ingreso</option>
+            <option value="expense">Egreso</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+          <select [(ngModel)]="filter.category"
+            class="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none">
+            <option value="all">Todas</option>
+            @for (cat of ALL_CATEGORIES; track cat) {
+              <option [value]="cat">{{ CATEGORY_LABELS[cat] }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Desde</label>
+          <input type="date" [(ngModel)]="filter.dateFrom"
+            class="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Hasta</label>
+          <input type="date" [(ngModel)]="filter.dateTo"
+            class="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none">
+        </div>
+        <div class="col-span-2 md:col-span-4 flex justify-end">
+          <button (click)="resetFilters()" class="text-xs text-[#D4A017] font-medium hover:underline">
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Transaction List -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="font-semibold text-[#1C2833] text-sm">
+        Movimientos
+        <span class="text-gray-400 font-normal ml-1">({{ filteredTransactions.length }})</span>
+      </h2>
+    </div>
+
+    @if (filteredTransactions.length === 0) {
+      <div class="flex flex-col items-center justify-center py-14 text-center px-4">
+        <div class="text-4xl mb-3">📭</div>
+        <p class="text-gray-500 text-sm font-medium">No hay movimientos</p>
+        <p class="text-gray-400 text-xs mt-1">Agrega un ingreso o egreso para empezar</p>
+      </div>
+    } @else {
+      <div class="divide-y divide-gray-50">
+        @for (tx of filteredTransactions; track tx.id) {
+          <div class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors group">
+            <!-- Category Icon -->
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+              [class.bg-[#28B463]/10]="tx.type === 'income'"
+              [class.bg-[#CB4335]/10]="tx.type === 'expense'">
+              {{ CATEGORY_ICONS[tx.category] }}
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[#1C2833] truncate">
+                {{ tx.description || CATEGORY_LABELS[tx.category] }}
+              </p>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="text-xs text-gray-400">{{ tx.date | date:'dd/MM/yyyy' }}</span>
+                <span class="text-gray-300">·</span>
+                <span class="text-xs px-1.5 py-0.5 rounded-full font-medium"
+                  [class.bg-[#28B463]/10]="tx.type === 'income'"
+                  [class.text-[#28B463]]="tx.type === 'income'"
+                  [class.bg-[#CB4335]/10]="tx.type === 'expense'"
+                  [class.text-[#CB4335]]="tx.type === 'expense'">
+                  {{ CATEGORY_LABELS[tx.category] }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Amount + Actions -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="font-bold text-sm"
+                [class.text-[#28B463]]="tx.type === 'income'"
+                [class.text-[#CB4335]]="tx.type === 'expense'">
+                {{ tx.type === 'income' ? '+' : '-' }}{{ formatCurrency(tx.amount) }}
+              </span>
+              <div class="hidden group-hover:flex items-center gap-1">
+                <button (click)="openEditForm(tx)"
+                  class="p-1.5 text-gray-400 hover:text-[#1C2833] hover:bg-gray-100 rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button (click)="confirmDelete(tx.id)"
+                  class="p-1.5 text-gray-400 hover:text-[#CB4335] hover:bg-red-50 rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Mobile FAB -->
+<button
+  (click)="openAddForm()"
+  class="md:hidden fixed bottom-20 right-4 z-20 w-14 h-14 rounded-full bg-[#D4A017] text-[#1C2833] shadow-lg flex items-center justify-center hover:bg-[#F0C040] transition-colors active:scale-95"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+  </svg>
+</button>
+
+<!-- Transaction Form Modal -->
+@if (showForm()) {
+  <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeForm()"></div>
+    <div class="relative bg-white w-full md:max-w-lg md:rounded-2xl shadow-2xl z-10 rounded-t-3xl max-h-[95vh] overflow-y-auto">
+
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-[#1C2833]">
+          {{ editingId() ? 'Editar movimiento' : 'Nuevo movimiento' }}
+        </h3>
+        <button (click)="closeForm()" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-5 py-4 space-y-4">
+        <!-- Type Toggle -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+          <div class="flex rounded-xl border border-gray-200 overflow-hidden">
+            <button type="button"
+              [class.bg-[#28B463]]="form.type === 'income'"
+              [class.text-white]="form.type === 'income'"
+              [class.bg-gray-50]="form.type !== 'income'"
+              [class.text-gray-500]="form.type !== 'income'"
+              (click)="form.type = 'income'; onTypeChange()"
+              class="flex-1 py-2.5 text-sm font-semibold transition-colors">
+              ↑ Ingreso
+            </button>
+            <button type="button"
+              [class.bg-[#CB4335]]="form.type === 'expense'"
+              [class.text-white]="form.type === 'expense'"
+              [class.bg-gray-50]="form.type !== 'expense'"
+              [class.text-gray-500]="form.type !== 'expense'"
+              (click)="form.type = 'expense'; onTypeChange()"
+              class="flex-1 py-2.5 text-sm font-semibold transition-colors border-l border-gray-200">
+              ↓ Egreso
+            </button>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Monto</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-medium">$</span>
+            <input type="number" [(ngModel)]="form.amount" min="0"
+              class="block w-full pl-7 pr-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+              placeholder="0">
+          </div>
+        </div>
+
+        <!-- Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Fecha</label>
+          <input type="date" [(ngModel)]="form.date"
+            class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+        </div>
+
+        <!-- Category -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
+          <select [(ngModel)]="form.category"
+            class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+            <option value="">Selecciona una categoría</option>
+            @for (cat of availableCategories; track cat) {
+              <option [value]="cat">{{ CATEGORY_ICONS[cat] }} {{ CATEGORY_LABELS[cat] }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Descripción <span class="text-gray-400">(opcional)</span></label>
+          <input type="text" [(ngModel)]="form.description"
+            class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+            placeholder="Ej. Compra supermercado">
+        </div>
+
+        @if (formError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2.5 rounded-lg">
+            {{ formError() }}
+          </div>
+        }
+
+        <div class="flex gap-3 pt-2 pb-2">
+          <button type="button" (click)="closeForm()"
+            class="flex-1 py-3 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button type="button" (click)="saveForm()"
+            [disabled]="!form.amount || !form.date || !form.category || formLoading()"
+            class="flex-1 py-3 rounded-xl text-sm font-bold text-[#1C2833] bg-[#D4A017] hover:bg-[#F0C040] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            @if (formLoading()) {
+              <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Guardando...
+            } @else {
+              {{ editingId() ? 'Guardar cambios' : 'Agregar' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation -->
+@if (deleteConfirmId()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50" (click)="cancelDelete()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+      <div class="text-center">
+        <div class="text-4xl mb-3">🗑️</div>
+        <h3 class="font-bold text-[#1C2833] mb-1">¿Eliminar movimiento?</h3>
+        <p class="text-sm text-gray-500 mb-5">Esta acción no se puede deshacer.</p>
+        <div class="flex gap-3">
+          <button (click)="cancelDelete()" class="flex-1 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button (click)="doDelete()" class="flex-1 py-2.5 bg-[#CB4335] text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

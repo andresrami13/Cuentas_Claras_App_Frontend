@@ -1,0 +1,332 @@
+<div class="min-h-screen bg-[#F2F3F4]">
+
+  <!-- Header -->
+  <div class="bg-[#1C2833] px-4 pt-6 pb-5 md:px-8">
+    <div class="flex items-center justify-between max-w-4xl mx-auto">
+      <div>
+        <h1 class="text-white font-bold text-xl leading-tight">Gestión de usuarios</h1>
+        <p class="text-white/40 text-sm mt-0.5">{{ users().length }} usuarios registrados</p>
+      </div>
+      <button (click)="openCreate()"
+        class="flex items-center gap-2 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-[#D4A017]/90 active:scale-95 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span>Nuevo</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4 md:p-6 max-w-4xl mx-auto">
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-20 gap-3">
+        <svg class="animate-spin w-8 h-8 text-[#D4A017]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <p class="text-gray-400 text-sm">Cargando usuarios...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error() && !loading()) {
+      <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="text-red-700 text-sm font-medium">{{ error() }}</p>
+          <button (click)="loadData()" class="text-red-600 text-xs underline mt-1">Reintentar</button>
+        </div>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!loading() && !error() && users().length === 0) {
+      <div class="flex flex-col items-center justify-center py-20 gap-4 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-[#1C2833]/10 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-[#1C2833]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-[#1C2833] font-semibold">Sin usuarios registrados</p>
+          <p class="text-gray-400 text-sm mt-1">Crea el primer usuario de la plataforma</p>
+        </div>
+        <button (click)="openCreate()" class="bg-[#1C2833] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-[#2E4057] transition-colors">
+          Crear usuario
+        </button>
+      </div>
+    }
+
+    <!-- User list -->
+    @if (!loading() && users().length > 0) {
+      <div class="space-y-3">
+        @for (user of users(); track user.documentNumber) {
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div class="flex items-start gap-3">
+              <!-- Avatar -->
+              <div class="w-11 h-11 rounded-xl bg-[#1C2833] flex items-center justify-center text-[#D4A017] font-bold text-sm shrink-0">
+                {{ initials(user) }}
+              </div>
+
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-[#1C2833] font-semibold text-sm leading-tight truncate">
+                    {{ user.name }} {{ user.lastName }}
+                  </p>
+                  <!-- Actions -->
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button (click)="openEdit(user)"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-[#1C2833] hover:bg-gray-100 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button (click)="confirmDelete(user)"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-gray-400 text-xs mt-0.5">
+                  {{ user.documentType }} · {{ user.documentNumber }}
+                </p>
+                <p class="text-gray-500 text-xs mt-0.5 truncate">{{ user.email }}</p>
+
+                <!-- Badges -->
+                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-[#D4A017]/15 text-[#B8860B]">
+                    {{ user.role?.roleCode ?? '—' }}
+                  </span>
+                  @if (user.locked) {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-600">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Bloqueado
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-600">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activo
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ── Create / Edit Modal ─────────────────────────────────────────── -->
+@if (showModal()) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeModal()"></div>
+
+    <div class="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl z-10 max-h-[92vh] flex flex-col">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
+        <h3 class="text-base font-bold text-[#1C2833]">
+          {{ editingUser() ? 'Editar usuario' : 'Nuevo usuario' }}
+        </h3>
+        <button (click)="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form (scrollable) -->
+      <div class="overflow-y-auto flex-1 px-5 py-4 space-y-5">
+
+        <!-- Identidad -->
+        <div>
+          <p class="text-xs font-bold text-[#D4A017] uppercase tracking-wider mb-3">Identidad</p>
+          <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tipo doc.</label>
+                <select [(ngModel)]="form.documentType" [disabled]="!!editingUser()"
+                  class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none disabled:opacity-60">
+                  @for (dt of documentTypes; track dt) {
+                    <option [value]="dt">{{ dt }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Número de doc. <span class="text-red-400">*</span></label>
+                <input type="text" [(ngModel)]="form.documentNumber" [readonly]="!!editingUser()"
+                  class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none read-only:opacity-60"
+                  placeholder="1019109757"/>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Nombre(s) <span class="text-red-400">*</span></label>
+                <input type="text" [(ngModel)]="form.name"
+                  class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+                  placeholder="Andrés"/>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Apellido(s) <span class="text-red-400">*</span></label>
+                <input type="text" [(ngModel)]="form.lastName"
+                  class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+                  placeholder="Ramírez"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contacto -->
+        <div>
+          <p class="text-xs font-bold text-[#D4A017] uppercase tracking-wider mb-3">Contacto</p>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Correo electrónico <span class="text-red-400">*</span></label>
+              <input type="email" [(ngModel)]="form.email"
+                class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+                placeholder="usuario@email.com"/>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Celular <span class="text-red-400">*</span></label>
+                <input type="tel" [(ngModel)]="form.celNumber"
+                  class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+                  placeholder="3103673285"/>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Fecha nacimiento <span class="text-red-400">*</span></label>
+                <input type="date" [(ngModel)]="form.birthDate"
+                  class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acceso -->
+        <div>
+          <p class="text-xs font-bold text-[#D4A017] uppercase tracking-wider mb-3">Acceso y rol</p>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                Contraseña {{ editingUser() ? '(dejar vacío para no cambiar)' : '' }} <span class="text-red-400">{{ editingUser() ? '' : '*' }}</span>
+              </label>
+              <div class="relative">
+                <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password"
+                  class="block w-full pr-10 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none"
+                  placeholder="••••••••"/>
+                <button type="button" (click)="showPassword.update(v => !v)"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                  @if (showPassword()) {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    </svg>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Rol <span class="text-red-400">*</span></label>
+              <select [(ngModel)]="form.roleCode"
+                class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+                @for (role of roles(); track role.roleCode) {
+                  <option [value]="role.roleCode">{{ role.roleCode }} — {{ role.roleName }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Locked toggle -->
+            <label class="flex items-center justify-between p-3 bg-gray-50 rounded-xl cursor-pointer">
+              <div>
+                <p class="text-sm font-medium text-[#1C2833]">Cuenta bloqueada</p>
+                <p class="text-xs text-gray-400">El usuario no podrá iniciar sesión</p>
+              </div>
+              <div class="relative">
+                <input type="checkbox" [(ngModel)]="form.locked" class="sr-only peer"/>
+                <div class="w-10 h-6 bg-gray-300 peer-checked:bg-red-500 rounded-full transition-colors peer-focus:ring-2 peer-focus:ring-red-300"></div>
+                <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        @if (formError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2.5 rounded-lg">
+            {{ formError() }}
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="px-5 py-4 border-t border-gray-100 shrink-0 flex gap-3">
+        <button (click)="closeModal()"
+          class="flex-1 py-3 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+          Cancelar
+        </button>
+        <button (click)="saveUser()" [disabled]="formLoading()"
+          class="flex-1 py-3 rounded-xl text-sm font-bold text-white bg-[#1C2833] hover:bg-[#2E4057] transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
+          @if (formLoading()) {
+            <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Guardando...
+          } @else {
+            {{ editingUser() ? 'Guardar cambios' : 'Crear usuario' }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Delete Confirmation ─────────────────────────────────────────── -->
+@if (userToDelete()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="cancelDelete()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm z-10 p-6">
+      <div class="flex flex-col items-center text-center gap-3">
+        <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-[#1C2833] font-bold text-base">¿Eliminar usuario?</p>
+          <p class="text-gray-500 text-sm mt-1">
+            Se eliminará a <span class="font-semibold text-[#1C2833]">{{ userToDelete()!.name }} {{ userToDelete()!.lastName }}</span> permanentemente.
+          </p>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-5">
+        <button (click)="cancelDelete()"
+          class="flex-1 py-3 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+          Cancelar
+        </button>
+        <button (click)="deleteUser()" [disabled]="deleteLoading()"
+          class="flex-1 py-3 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
+          @if (deleteLoading()) {
+            <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+          }
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,13 @@
+{
+  "/api": {
+    "target": "https://backend-spendcount-bgchhcgcemezfzhp.chilecentral-01.azurewebsites.net",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "headers": {
+      "Origin": "http://localhost:5173"
+    }
+  }
+}

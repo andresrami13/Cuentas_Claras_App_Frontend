@@ -1,0 +1,304 @@
+<div class="p-4 md:p-6 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl md:text-2xl font-bold text-[#1C2833]">Mis Metas</h1>
+      <p class="text-sm text-gray-500 mt-0.5">Gestiona tus objetivos financieros</p>
+    </div>
+    <button
+      (click)="openCreateForm()"
+      class="hidden md:flex items-center gap-2 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-[#F0C040] transition-colors shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nueva meta
+    </button>
+  </div>
+
+  <!-- Skeleton -->
+  @if (loading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="bg-gray-200 rounded-2xl h-52"></div>
+      }
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading() && goals().length === 0) {
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+      <div class="text-5xl mb-4">🎯</div>
+      <h2 class="font-bold text-[#1C2833] text-lg mb-2">Aún no tienes metas</h2>
+      <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">
+        Crea tu primera meta financiera para que el Coach IA pueda asesorarte y ayudarte a alcanzarla.
+      </p>
+      <button
+        (click)="openCreateForm()"
+        class="inline-flex items-center gap-2 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#F0C040] transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Crear primera meta
+      </button>
+    </div>
+  }
+
+  <!-- Goals grid -->
+  @if (!loading() && goals().length > 0) {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (goal of goals(); track goal.id) {
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group">
+
+          <!-- Card header -->
+          <div class="bg-[#1C2833] px-5 py-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="text-2xl flex-shrink-0">🎯</div>
+                <div class="min-w-0">
+                  <h3 class="font-bold text-white text-base leading-tight truncate">{{ goal.name }}</h3>
+                  @if (goal.description) {
+                    <p class="text-xs text-white/50 mt-0.5 truncate">{{ goal.description }}</p>
+                  }
+                </div>
+              </div>
+              <div class="flex items-center gap-1 flex-shrink-0">
+                <!-- Status badge -->
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  [class.bg-[#D4A017]/20]="goal.status === 'ACTIVE'"
+                  [class.text-[#D4A017]]="goal.status === 'ACTIVE'"
+                  [class.bg-[#28B463]/20]="goal.status === 'COMPLETED'"
+                  [class.text-[#28B463]]="goal.status === 'COMPLETED'"
+                  [class.bg-white/10]="goal.status === 'CANCELLED'"
+                  [class.text-white/40]="goal.status === 'CANCELLED'">
+                  {{ STATUS_LABELS[goal.status] }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mt-4">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs text-white/50">Progreso</span>
+                <span class="text-sm font-bold text-[#D4A017]">{{ progressPercent(goal) }}%</span>
+              </div>
+              <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-[#D4A017] rounded-full transition-all duration-700"
+                  [style.width.%]="progressPercent(goal)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card body -->
+          <div class="px-5 py-4">
+            <div class="grid grid-cols-3 gap-3 mb-4">
+              <div class="text-center">
+                <p class="text-xs text-gray-400 mb-1">Acumulado</p>
+                <p class="text-sm font-bold text-[#28B463]">{{ formatCurrency(goal.currentAmount) }}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs text-gray-400 mb-1">Meta</p>
+                <p class="text-sm font-bold text-[#1C2833]">{{ formatCurrency(goal.targetAmount) }}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs text-gray-400 mb-1">Días</p>
+                <p class="text-sm font-bold"
+                  [class.text-[#D4A017]]="daysLeft(goal.deadline) > 30"
+                  [class.text-[#CB4335]]="daysLeft(goal.deadline) <= 30 && daysLeft(goal.deadline) > 0"
+                  [class.text-gray-400]="daysLeft(goal.deadline) === 0">
+                  {{ daysLeft(goal.deadline) > 0 ? daysLeft(goal.deadline) : 'Vencida' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <a [routerLink]="['/coach']" [queryParams]="{goalId: goal.id}"
+                class="flex items-center gap-1.5 text-xs font-semibold text-[#1C2833] bg-[#D4A017]/10 hover:bg-[#D4A017]/20 border border-[#D4A017]/30 px-3 py-1.5 rounded-lg transition-colors">
+                <img src="https://i.ibb.co/60kjzFsJ/Gemini-Generated-Image-gzmgxugzmgxugzmg-removebg-preview.webp" alt="Coach IA" class="w-4 h-4 object-contain"/>
+                Coach IA
+              </a>
+              <div class="flex items-center gap-1">
+                <button (click)="openEditForm(goal)"
+                  class="p-1.5 text-gray-400 hover:text-[#1C2833] hover:bg-gray-100 rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button (click)="confirmDelete(goal.id)"
+                  class="p-1.5 text-gray-400 hover:text-[#CB4335] hover:bg-red-50 rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Link al coach si hay meta activa -->
+    @if (goals().length > 0) {
+      <div class="mt-5 bg-[#D4A017]/10 border border-[#D4A017]/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <img src="https://i.ibb.co/60kjzFsJ/Gemini-Generated-Image-gzmgxugzmgxugzmg-removebg-preview.webp" alt="Coach IA" class="w-9 h-9 object-contain"/>
+          <p class="text-sm text-[#1C2833] font-medium">¿Quieres consejos para alcanzar tus metas?</p>
+        </div>
+        <a routerLink="/coach"
+          class="flex-shrink-0 text-sm font-bold text-[#1C2833] bg-[#D4A017] px-4 py-2 rounded-xl hover:bg-[#F0C040] transition-colors">
+          Ir al Coach IA
+        </a>
+      </div>
+    }
+  }
+
+</div>
+
+<!-- Mobile FAB -->
+<button
+  (click)="openCreateForm()"
+  class="md:hidden fixed bottom-20 right-4 z-20 w-14 h-14 rounded-full bg-[#D4A017] text-[#1C2833] shadow-lg flex items-center justify-center hover:bg-[#F0C040] transition-colors active:scale-95">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+  </svg>
+</button>
+
+<!-- Form Modal -->
+@if (showForm()) {
+  <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeForm()"></div>
+    <div class="relative bg-white w-full md:max-w-lg md:rounded-2xl shadow-2xl z-10 rounded-t-3xl max-h-[95vh] overflow-y-auto">
+
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-[#1C2833]">
+          {{ editingId() ? 'Editar meta' : 'Nueva meta' }}
+        </h3>
+        <button (click)="closeForm()" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-5 py-4 space-y-4">
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
+          <input type="text" [(ngModel)]="form.name" placeholder="Ej. Fondo de emergencia"
+            class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Descripción <span class="text-gray-400">(opcional)</span></label>
+          <input type="text" [(ngModel)]="form.description" placeholder="Ej. 3 meses de gastos cubiertos"
+            class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+        </div>
+
+        <!-- Monto objetivo / Monto ahorrado -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Monto objetivo</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-medium">$</span>
+              <input type="number" [(ngModel)]="form.targetAmount" min="0" placeholder="0"
+                class="block w-full pl-7 pr-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Ya ahorrado</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-medium">$</span>
+              <input type="number" [(ngModel)]="form.currentAmount" min="0" placeholder="0"
+                class="block w-full pl-7 pr-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Fecha inicio / Fecha límite -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Fecha inicio</label>
+            <input type="date" [(ngModel)]="form.startDate"
+              class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Fecha límite</label>
+            <input type="date" [(ngModel)]="form.targetDate"
+              class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+          </div>
+        </div>
+
+        <!-- Estado (solo al editar) -->
+        @if (editingId()) {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
+            <select [(ngModel)]="form.status"
+              class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+              @for (s of statuses; track s) {
+                <option [value]="s">{{ STATUS_LABELS[s] }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (formError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2.5 rounded-lg">
+            {{ formError() }}
+          </div>
+        }
+
+        <div class="flex gap-3 pt-2 pb-2">
+          <button type="button" (click)="closeForm()"
+            class="flex-1 py-3 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button type="button" (click)="saveForm()"
+            [disabled]="!form.name || !form.targetAmount || !form.targetDate || formLoading()"
+            class="flex-1 py-3 rounded-xl text-sm font-bold text-[#1C2833] bg-[#D4A017] hover:bg-[#F0C040] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            @if (formLoading()) {
+              <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Guardando...
+            } @else {
+              {{ editingId() ? 'Guardar cambios' : 'Crear meta' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation -->
+@if (deleteConfirmId()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50" (click)="cancelDelete()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+      <div class="text-center">
+        <div class="text-4xl mb-3">🗑️</div>
+        <h3 class="font-bold text-[#1C2833] mb-1">¿Eliminar meta?</h3>
+        <p class="text-sm text-gray-500 mb-5">Esta acción no se puede deshacer.</p>
+        @if (deleteError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-lg mb-4">
+            {{ deleteError() }}
+          </div>
+        }
+        <div class="flex gap-3">
+          <button (click)="cancelDelete()"
+            class="flex-1 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button (click)="doDelete()"
+            class="flex-1 py-2.5 bg-[#CB4335] text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-colors">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

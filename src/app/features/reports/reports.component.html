@@ -1,0 +1,97 @@
+<div class="p-4 md:p-6 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-xl md:text-2xl font-bold text-[#1C2833]">Reportes financieros</h1>
+    <p class="text-sm text-gray-500 mt-0.5">Resumen de tus finanzas</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <p class="text-xs text-gray-500 font-medium mb-1.5">Total ingresos</p>
+      <p class="text-[#28B463] font-bold text-base">{{ formatCurrency(totalIncome()) }}</p>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <p class="text-xs text-gray-500 font-medium mb-1.5">Total egresos</p>
+      <p class="text-[#CB4335] font-bold text-base">{{ formatCurrency(totalExpenses()) }}</p>
+    </div>
+    <div class="bg-[#1C2833] rounded-2xl p-4 shadow-sm">
+      <p class="text-xs text-white/60 font-medium mb-1.5">Balance neto</p>
+      <p class="font-bold text-base"
+        [class.text-[#D4A017]]="balance() >= 0"
+        [class.text-[#CB4335]]="balance() < 0">
+        {{ formatCurrency(balance()) }}
+      </p>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <p class="text-xs text-gray-500 font-medium mb-1.5">Tasa de ahorro</p>
+      <p class="font-bold text-base"
+        [class.text-[#28B463]]="savingsRate >= 20"
+        [class.text-[#D4A017]]="savingsRate >= 10 && savingsRate < 20"
+        [class.text-[#CB4335]]="savingsRate < 10">
+        {{ savingsRate }}%
+      </p>
+    </div>
+  </div>
+
+  <!-- Monthly Chart -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+    <h2 class="font-semibold text-[#1C2833] text-sm mb-4">Ingresos vs Egresos por mes</h2>
+    @if (monthlyChartOptions.series) {
+      <apx-chart
+        [series]="monthlyChartOptions.series"
+        [chart]="monthlyChartOptions.chart"
+        [colors]="monthlyChartOptions.colors"
+        [plotOptions]="monthlyChartOptions.plotOptions"
+        [dataLabels]="monthlyChartOptions.dataLabels"
+        [stroke]="monthlyChartOptions.stroke"
+        [xaxis]="monthlyChartOptions.xaxis"
+        [yaxis]="monthlyChartOptions.yaxis"
+        [grid]="monthlyChartOptions.grid"
+        [legend]="monthlyChartOptions.legend"
+        [tooltip]="monthlyChartOptions.tooltip"
+      ></apx-chart>
+    }
+  </div>
+
+  <!-- Category Chart -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+    <h2 class="font-semibold text-[#1C2833] text-sm mb-4">Movimientos por categoría</h2>
+    @if (categoryChartOptions.series) {
+      <apx-chart
+        [series]="categoryChartOptions.series"
+        [chart]="categoryChartOptions.chart"
+        [colors]="categoryChartOptions.colors"
+        [plotOptions]="categoryChartOptions.plotOptions"
+        [dataLabels]="categoryChartOptions.dataLabels"
+        [xaxis]="categoryChartOptions.xaxis"
+        [yaxis]="categoryChartOptions.yaxis"
+        [grid]="categoryChartOptions.grid"
+        [tooltip]="categoryChartOptions.tooltip"
+      ></apx-chart>
+    }
+  </div>
+
+  <!-- Top Expense Categories -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+    <h2 class="font-semibold text-[#1C2833] text-sm mb-4">Top categorías de gasto</h2>
+    <div class="space-y-3">
+      @for (cat of topExpenseCategories; track cat.category) {
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-sm text-gray-700 font-medium">{{ cat.label }}</span>
+            <span class="text-sm font-bold text-[#CB4335]">{{ formatCurrency(cat.amount) }}</span>
+          </div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-[#CB4335] rounded-full transition-all duration-500"
+              [style.width.%]="(cat.amount / totalExpenses()) * 100">
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">{{ ((cat.amount / totalExpenses()) * 100).toFixed(1) }}% del total de egresos</p>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>
