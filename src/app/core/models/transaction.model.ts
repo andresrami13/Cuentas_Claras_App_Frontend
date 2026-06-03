@@ -1,12 +1,23 @@
 export type TransactionType = 'income' | 'expense';
 
 export type TransactionCategory =
-  | 'salary' | 'freelance' | 'investment' | 'gift'
-  | 'food' | 'transport' | 'housing' | 'health'
-  | 'entertainment' | 'education' | 'shopping' | 'other';
+  // Ingresos
+  | 'salary' | 'freelance' | 'investment' | 'gift' | 'other'
+  // Egresos
+  | 'arriendo' | 'mercado' | 'servicios' | 'datos'
+  | 'spotify_youtube' | 'plan_complementario' | 'transportes'
+  | 'gastos_andres' | 'piano' | 'ahorro' | 'techo' | 'ayuda_mama';
 
-export const INCOME_CATEGORIES: TransactionCategory[] = ['salary', 'freelance', 'investment', 'gift'];
-export const EXPENSE_CATEGORIES: TransactionCategory[] = ['food', 'transport', 'housing', 'health', 'entertainment', 'education', 'shopping', 'other'];
+export const INCOME_CATEGORIES: TransactionCategory[] = [
+  'salary', 'freelance', 'investment', 'gift', 'other',
+];
+
+export const EXPENSE_CATEGORIES: TransactionCategory[] = [
+  'arriendo', 'mercado', 'servicios', 'datos', 'spotify_youtube',
+  'plan_complementario', 'transportes', 'gastos_andres', 'piano',
+  'ahorro', 'techo', 'ayuda_mama',
+];
+
 export const ALL_CATEGORIES: TransactionCategory[] = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
 export const CATEGORY_LABELS: Record<TransactionCategory, string> = {
@@ -14,14 +25,19 @@ export const CATEGORY_LABELS: Record<TransactionCategory, string> = {
   freelance: 'Freelance',
   investment: 'Inversión',
   gift: 'Regalo',
-  food: 'Alimentación',
-  transport: 'Transporte',
-  housing: 'Vivienda',
-  health: 'Salud',
-  entertainment: 'Entretenimiento',
-  education: 'Educación',
-  shopping: 'Compras',
-  other: 'Otros',
+  other: 'Otro',
+  arriendo: 'Arriendo',
+  mercado: 'Mercado',
+  servicios: 'Servicios',
+  datos: 'Datos',
+  spotify_youtube: 'Spotify/YouTube',
+  plan_complementario: 'Plan complementario',
+  transportes: 'Transportes',
+  gastos_andres: 'Gastos Andrés',
+  piano: 'Piano',
+  ahorro: 'Ahorro',
+  techo: 'Techo',
+  ayuda_mama: 'Ayuda mamá',
 };
 
 export const CATEGORY_ICONS: Record<TransactionCategory, string> = {
@@ -29,14 +45,19 @@ export const CATEGORY_ICONS: Record<TransactionCategory, string> = {
   freelance: '💻',
   investment: '📈',
   gift: '🎁',
-  food: '🍽️',
-  transport: '🚌',
-  housing: '🏠',
-  health: '⚕️',
-  entertainment: '🎬',
-  education: '📚',
-  shopping: '🛍️',
   other: '📦',
+  arriendo: '🏠',
+  mercado: '🛒',
+  servicios: '💡',
+  datos: '📱',
+  spotify_youtube: '🎵',
+  plan_complementario: '🏥',
+  transportes: '🚌',
+  gastos_andres: '💳',
+  piano: '🎹',
+  ahorro: '🐷',
+  techo: '🏗️',
+  ayuda_mama: '❤️',
 };
 
 export interface Transaction {
