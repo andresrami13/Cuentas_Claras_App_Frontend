@@ -16,29 +16,30 @@
       <h1 class="text-xl md:text-2xl font-bold text-[#1C2833]">Presupuesto</h1>
       <p class="text-sm text-gray-500 mt-0.5">Control de tu ciclo de gastos</p>
     </div>
-    @if (cycle()) {
-      <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2">
+      @if (cycle()) {
         <button
           (click)="goToConfig()"
-          class="hidden md:flex items-center gap-2 border border-gray-200 text-gray-600 font-medium text-sm px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+          title="Configuración"
+          class="p-2 border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50 transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
-          Configuración
         </button>
-        <button
-          (click)="openAddCategory()"
-          class="hidden md:flex items-center gap-2 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-[#F0C040] transition-colors shadow-sm"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-          </svg>
-          Agregar categoría
-        </button>
-      </div>
-    }
+      }
+      <button
+        (click)="goToNewMovement()"
+        class="flex items-center gap-1.5 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-4 py-2.5 rounded-xl hover:bg-[#F0C040] transition-colors shadow-sm"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span class="hidden sm:inline">Nuevo movimiento</span>
+        <span class="sm:hidden">Movimiento</span>
+      </button>
+    </div>
   </div>
 
   <!-- ── Estado: cargando / creando ciclo ─────────────────────────────────── -->
@@ -139,20 +140,9 @@
             {{ formatDate(c.startDate) }} → {{ formatDate(c.endDate) }}
           </p>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs bg-[#28B463]/20 text-[#28B463] font-bold px-2.5 py-1 rounded-full">
-            Activo
-          </span>
-          <button
-            (click)="goToConfig()"
-            class="md:hidden p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-          </button>
-        </div>
+        <span class="text-xs bg-[#28B463]/20 text-[#28B463] font-bold px-2.5 py-1 rounded-full">
+          Activo
+        </span>
       </div>
 
       <!-- Tarjetas resumen -->
@@ -204,10 +194,23 @@
       <!-- Lista de categorías -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="font-semibold text-[#1C2833] text-sm">
-            Categorías
-            <span class="text-gray-400 font-normal ml-1">({{ c.categories.length }})</span>
-          </h2>
+          <div>
+            <h2 class="font-semibold text-[#1C2833] text-sm">
+              Categorías
+              <span class="text-gray-400 font-normal ml-1">({{ c.categories.length }})</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Solo para este ciclo</p>
+          </div>
+          <button
+            (click)="openAddCategory()"
+            title="Agregar categoría a este ciclo"
+            class="flex items-center gap-1.5 text-xs font-semibold text-[#1C2833] bg-[#D4A017]/15 hover:bg-[#D4A017]/30 px-2.5 py-1.5 rounded-lg transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Agregar
+          </button>
         </div>
 
         @if (c.categories.length === 0) {
@@ -284,17 +287,16 @@
   }
 </div>
 
-<!-- Mobile FAB -->
-@if (cycle()) {
-  <button
-    (click)="openAddCategory()"
-    class="md:hidden fixed bottom-20 right-4 z-20 w-14 h-14 rounded-full bg-[#D4A017] text-[#1C2833] shadow-lg flex items-center justify-center hover:bg-[#F0C040] transition-colors active:scale-95"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-    </svg>
-  </button>
-}
+<!-- Mobile FAB: Nuevo movimiento -->
+<button
+  (click)="goToNewMovement()"
+  class="md:hidden fixed bottom-20 right-4 z-20 w-14 h-14 rounded-full bg-[#D4A017] text-[#1C2833] shadow-lg flex items-center justify-center hover:bg-[#F0C040] transition-colors active:scale-95"
+  title="Nuevo movimiento"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+  </svg>
+</button>
 
 <!-- ── Modal: crear ciclo manualmente (fallback) ─────────────────────────── -->
 @if (showCreateForm()) {
@@ -353,9 +355,14 @@
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="closeCategoryForm()"></div>
     <div class="relative bg-white w-full md:max-w-md md:rounded-2xl shadow-2xl z-10 rounded-t-3xl">
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <h3 class="text-base font-bold text-[#1C2833]">
-          {{ editingCategoryId() ? 'Editar categoría' : 'Agregar categoría' }}
-        </h3>
+        <div>
+          <h3 class="text-base font-bold text-[#1C2833]">
+            {{ editingCategoryId() ? 'Editar categoría' : 'Agregar categoría' }}
+          </h3>
+          @if (!editingCategoryId()) {
+            <p class="text-xs text-gray-400 mt-0.5">Solo aplica al ciclo actual</p>
+          }
+        </div>
         <button (click)="closeCategoryForm()" class="text-gray-400 hover:text-gray-600 p-1">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>

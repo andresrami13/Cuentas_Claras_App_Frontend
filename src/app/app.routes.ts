@@ -13,7 +13,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./shared/layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
-      { path: '', redirectTo: 'transactions', pathMatch: 'full' },
+      { path: '', redirectTo: 'budget', pathMatch: 'full' },
       {
         path: 'transactions',
         loadComponent: () => import('./features/transactions/transactions.component').then(m => m.TransactionsComponent),

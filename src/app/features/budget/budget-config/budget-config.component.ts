@@ -28,7 +28,6 @@ export class BudgetConfigComponent implements OnInit {
 
   saveLoading = signal(false);
   saveError = signal<string | null>(null);
-  saveSuccess = signal(false);
 
   async ngOnInit(): Promise<void> {
     await this.budgetService.loadConfig();
@@ -69,7 +68,6 @@ export class BudgetConfigComponent implements OnInit {
     if (!this.payDay || !this.nextPayDate) return;
     this.saveLoading.set(true);
     this.saveError.set(null);
-    this.saveSuccess.set(false);
     try {
       await this.budgetService.saveConfig({
         documentNumber: '',
@@ -77,8 +75,8 @@ export class BudgetConfigComponent implements OnInit {
         nextPayDate: this.nextPayDate,
         fixedCategories: this.fixedCategories,
       });
-      this.saveSuccess.set(true);
-      setTimeout(() => this.saveSuccess.set(false), 3000);
+      await this.budgetService.syncCycleWithConfig();
+      this.router.navigate(['/budget']);
     } catch (err: unknown) {
       this.saveError.set(err instanceof Error ? err.message : 'Error al guardar la configuración');
     } finally {

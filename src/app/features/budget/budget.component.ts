@@ -200,4 +200,8 @@ export class BudgetComponent implements OnInit {
   goToConfig(): void {
     this.router.navigate(['/budget/config']);
   }
+
+  goToNewMovement(): void {
+    this.router.navigate(['/transactions']);
+  }
 }

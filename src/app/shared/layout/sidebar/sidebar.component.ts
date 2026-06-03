@@ -30,9 +30,9 @@ export class SidebarComponent {
       ];
     }
     return [
+      { label: 'Presupuesto', route: '/budget', icon: 'budget' },
       { label: 'Movimientos', route: '/transactions', icon: 'transactions' },
       { label: 'Reportes', route: '/reports', icon: 'reports' },
-      { label: 'Presupuesto', route: '/budget', icon: 'budget' },
       { label: 'Metas', route: '/goals', icon: 'goals' },
       { label: 'Coach IA', route: '/coach', icon: 'coach' },
     ];

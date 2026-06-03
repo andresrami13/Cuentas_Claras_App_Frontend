@@ -224,6 +224,21 @@ export class BudgetService {
     }
   }
 
+  async syncCycleWithConfig(): Promise<void> {
+    const config = this._config();
+    const cycle = this._cycle();
+    if (!config || !cycle || config.fixedCategories.length === 0) return;
+
+    for (const fc of config.fixedCategories) {
+      const existing = cycle.categories.find(c => c.name === fc.name);
+      if (existing) {
+        await this.updateCategory(existing.id, { name: fc.name, assigned: fc.amount });
+      } else {
+        await this.addCategory({ name: fc.name, assigned: fc.amount });
+      }
+    }
+  }
+
   async loadConfig(): Promise<void> {
     try {
       const res = await lastValueFrom(
