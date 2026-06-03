@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
@@ -29,7 +29,12 @@ export class BudgetComponent implements OnInit {
   readonly CATEGORY_LABELS = CATEGORY_LABELS;
   readonly CATEGORY_ICONS = CATEGORY_ICONS;
 
-  // Create cycle modal
+  // Auto-creation state
+  autoCreating = signal(false);
+  autoCreated = signal(false);
+  autoCreateError = signal<string | null>(null);
+
+  // Manual cycle creation (fallback si auto-creación falla)
   showCreateForm = signal(false);
   createForm: CreateCycleForm = { startDate: '', endDate: '' };
   createLoading = signal(false);
@@ -42,9 +47,60 @@ export class BudgetComponent implements OnInit {
   categoryLoading = signal(false);
   categoryError = signal<string | null>(null);
 
+  readonly isLoadingAny = computed(() => this.loading() || this.autoCreating());
+
   async ngOnInit(): Promise<void> {
+    await this.budgetService.loadConfig();
     await this.budgetService.loadActiveCycle();
+
+    if (!this.budgetService.cycle()) {
+      const config = this.budgetService.config();
+      if (config?.payDay) {
+        const today = new Date().toISOString().split('T')[0];
+        const nextPay = config.nextPayDate || today;
+        if (today >= nextPay) {
+          this.autoCreating.set(true);
+          try {
+            await this.budgetService.autoCreateCycle();
+            this.autoCreated.set(true);
+            setTimeout(() => this.autoCreated.set(false), 5000);
+          } catch (err: unknown) {
+            this.autoCreateError.set(
+              err instanceof Error ? err.message : 'No se pudo crear el ciclo automáticamente'
+            );
+          } finally {
+            this.autoCreating.set(false);
+          }
+        }
+      }
+    }
   }
+
+  // ── Computed state helpers ─────────────────────────────────────────────────
+
+  get hasConfig(): boolean {
+    return !!this.budgetService.config()?.payDay;
+  }
+
+  get nextCycleNotStarted(): boolean {
+    const cfg = this.budgetService.config();
+    if (!cfg?.nextPayDate) return false;
+    return new Date().toISOString().split('T')[0] < cfg.nextPayDate;
+  }
+
+  get nextPayDateDisplay(): string {
+    return this.formatDate(this.budgetService.config()?.nextPayDate ?? '');
+  }
+
+  get currentCycleMonthName(): string {
+    const start = this.cycle()?.startDate;
+    if (!start) return '';
+    const [y, m] = start.split('-');
+    return new Date(Number(y), Number(m) - 1, 1)
+      .toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
   getSpentPct(cat: BudgetCategory): number {
     if (cat.assigned <= 0) return 0;
@@ -70,15 +126,12 @@ export class BudgetComponent implements OnInit {
     return `${d}/${m}/${y}`;
   }
 
-  // ── Create cycle ───────────────────────────────────────────────────────────
+  // ── Manual cycle creation (fallback) ──────────────────────────────────────
 
   openCreateForm(): void {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), 1)
-      .toISOString().split('T')[0];
-    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      .toISOString().split('T')[0];
-    this.createForm = { startDate: start, endDate: end };
+    const cfg = this.budgetService.config();
+    const startDate = cfg?.nextPayDate || new Date().toISOString().split('T')[0];
+    this.createForm = { startDate, endDate: '' };
     this.createError.set(null);
     this.showCreateForm.set(true);
   }

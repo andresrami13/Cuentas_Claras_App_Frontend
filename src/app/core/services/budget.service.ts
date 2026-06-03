@@ -36,6 +36,30 @@ interface UserBudgetConfigDto {
   fixedCategories?: { categoryName?: string; amount?: number }[];
 }
 
+// ── Date helpers ─────────────────────────────────────────────────────────────
+
+function calcCycleEndDate(startDate: string, payDay: number): string {
+  const start = new Date(startDate + 'T00:00:00');
+  const nextYear = start.getMonth() === 11 ? start.getFullYear() + 1 : start.getFullYear();
+  const nextMonth = (start.getMonth() + 1) % 12;
+  const lastDayOfNextMonth = new Date(nextYear, nextMonth + 1, 0).getDate();
+  const actualPayDay = Math.min(payDay, lastDayOfNextMonth);
+  const nextPayMs = new Date(nextYear, nextMonth, actualPayDay).getTime();
+  const end = new Date(nextPayMs - 86_400_000); // día anterior al próximo pago
+  return end.toISOString().split('T')[0];
+}
+
+function calcNextPayDate(payDay: number, cycleStartDate: string): string {
+  const start = new Date(cycleStartDate + 'T00:00:00');
+  const nextYear = start.getMonth() === 11 ? start.getFullYear() + 1 : start.getFullYear();
+  const nextMonth = (start.getMonth() + 1) % 12;
+  const lastDay = new Date(nextYear, nextMonth + 1, 0).getDate();
+  const day = Math.min(payDay, lastDay);
+  return `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function toCategory(dto: BudgetCategoryDto): BudgetCategory {
   const assigned = dto.assignedAmount ?? 0;
   const spent = dto.spentAmount ?? 0;
@@ -166,6 +190,28 @@ export class BudgetService {
       ...c,
       categories: c.categories.map(cat => cat.id === categoryId ? updated : cat),
     } : c);
+  }
+
+  async autoCreateCycle(): Promise<void> {
+    const config = this._config();
+    if (!config) throw new Error('No hay configuración de presupuesto');
+
+    const startDate = config.nextPayDate || new Date().toISOString().split('T')[0];
+    const endDate = calcCycleEndDate(startDate, config.payDay);
+
+    this._loading.set(true);
+    try {
+      await this.createCycle({ startDate, endDate });
+
+      for (const fc of config.fixedCategories) {
+        await this.addCategory({ name: fc.name, assigned: fc.amount });
+      }
+
+      const newNextPayDate = calcNextPayDate(config.payDay, startDate);
+      await this.saveConfig({ ...config, nextPayDate: newNextPayDate });
+    } finally {
+      this._loading.set(false);
+    }
   }
 
   async loadConfig(): Promise<void> {
