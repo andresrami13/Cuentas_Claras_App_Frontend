@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { TransactionService } from '../../core/services/transaction.service';
 import { AuthService } from '../../core/services/auth.service';
 import {
@@ -27,7 +28,7 @@ const EMPTY_FILTER: TransactionFilter = {
 
 @Component({
   selector: 'app-transactions',
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, AmountInputDirective],
   templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {

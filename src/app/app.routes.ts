@@ -24,11 +24,17 @@ export const routes: Routes = [
       },
       {
         path: 'budget',
-        loadComponent: () => import('./features/budget/budget.component').then(m => m.BudgetComponent),
-      },
-      {
-        path: 'budget/config',
-        loadComponent: () => import('./features/budget/budget-config/budget-config.component').then(m => m.BudgetConfigComponent),
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            loadComponent: () => import('./features/budget/budget.component').then(m => m.BudgetComponent),
+          },
+          {
+            path: 'config',
+            loadComponent: () => import('./features/budget/budget-config/budget-config.component').then(m => m.BudgetConfigComponent),
+          },
+        ],
       },
       {
         path: 'goals',

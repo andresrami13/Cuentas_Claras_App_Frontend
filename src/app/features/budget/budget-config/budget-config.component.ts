@@ -1,13 +1,14 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AmountInputDirective } from '../../../shared/directives/amount-input.directive';
 import { BudgetService } from '../../../core/services/budget.service';
 import { FixedBudgetCategory } from '../../../core/models/budget.model';
 import { EXPENSE_CATEGORIES, CATEGORY_LABELS, CATEGORY_ICONS } from '../../../core/models/transaction.model';
 
 @Component({
   selector: 'app-budget-config',
-  imports: [FormsModule],
+  imports: [FormsModule, AmountInputDirective],
   templateUrl: './budget-config.component.html',
 })
 export class BudgetConfigComponent implements OnInit {

@@ -13,27 +13,36 @@ import { environment } from '../../../environments/environment';
 const API = environment.apiUrl;
 
 interface BudgetCycleDto {
-  cycleId?: number | string;
+  id?: number;
   userDocumentNumber?: string;
   startDate?: string;
   endDate?: string;
+  paymentDay?: number;
   status?: string;
   categories?: BudgetCategoryDto[];
 }
 
 interface BudgetCategoryDto {
-  categoryId?: number | string;
+  id?: number;
+  cycleId?: number;
   categoryName?: string;
   assignedAmount?: number;
   spentAmount?: number;
+  availableAmount?: number;
+}
+
+interface FixedBudgetCategoryDto {
+  id?: number;
+  categoryName?: string;
+  amount?: number;
 }
 
 interface UserBudgetConfigDto {
-  configId?: number | string;
+  id?: number;
   userDocumentNumber?: string;
-  payDay?: number;
-  nextPayDate?: string;
-  fixedCategories?: { categoryName?: string; amount?: number }[];
+  paymentDay?: number;
+  nextPaymentDate?: string;
+  fixedCategories?: FixedBudgetCategoryDto[];
 }
 
 // ── Date helpers ─────────────────────────────────────────────────────────────
@@ -64,7 +73,7 @@ function toCategory(dto: BudgetCategoryDto): BudgetCategory {
   const assigned = dto.assignedAmount ?? 0;
   const spent = dto.spentAmount ?? 0;
   return {
-    id: String(dto.categoryId ?? ''),
+    id: String(dto.id ?? ''),
     name: dto.categoryName ?? '',
     assigned,
     spent,
@@ -74,7 +83,7 @@ function toCategory(dto: BudgetCategoryDto): BudgetCategory {
 
 function toCycle(dto: BudgetCycleDto): BudgetCycle {
   return {
-    id: String(dto.cycleId ?? ''),
+    id: String(dto.id ?? ''),
     documentNumber: dto.userDocumentNumber ?? '',
     startDate: dto.startDate ?? '',
     endDate: dto.endDate ?? '',
@@ -86,8 +95,8 @@ function toCycle(dto: BudgetCycleDto): BudgetCycle {
 function toConfig(dto: UserBudgetConfigDto): UserBudgetConfig {
   return {
     documentNumber: dto.userDocumentNumber ?? '',
-    payDay: dto.payDay ?? 1,
-    nextPayDate: dto.nextPayDate ?? '',
+    payDay: dto.paymentDay ?? 1,
+    nextPayDate: dto.nextPaymentDate ?? '',
     fixedCategories: (dto.fixedCategories ?? []).map(fc => ({
       name: fc.categoryName ?? '',
       amount: fc.amount ?? 0,
@@ -148,6 +157,7 @@ export class BudgetService {
       userDocumentNumber: this.documentNumber,
       startDate: form.startDate,
       endDate: form.endDate,
+      paymentDay: form.paymentDay,
       status: 'ACTIVE',
     };
     const res = await lastValueFrom(
@@ -201,7 +211,7 @@ export class BudgetService {
 
     this._loading.set(true);
     try {
-      await this.createCycle({ startDate, endDate });
+      await this.createCycle({ startDate, endDate, paymentDay: config.payDay });
 
       for (const fc of config.fixedCategories) {
         await this.addCategory({ name: fc.name, assigned: fc.amount });
@@ -230,8 +240,8 @@ export class BudgetService {
   async saveConfig(data: UserBudgetConfig): Promise<void> {
     const body: UserBudgetConfigDto = {
       userDocumentNumber: this.documentNumber,
-      payDay: data.payDay,
-      nextPayDate: data.nextPayDate,
+      paymentDay: data.payDay,
+      nextPaymentDate: data.nextPayDate,
       fixedCategories: data.fixedCategories.map(fc => ({
         categoryName: fc.name,
         amount: fc.amount,

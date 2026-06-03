@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
+import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { BudgetService } from '../../core/services/budget.service';
 import { AuthService } from '../../core/services/auth.service';
 import { BudgetCategory, CreateCycleForm, AddCategoryForm } from '../../core/models/budget.model';
@@ -11,7 +12,7 @@ import {
 
 @Component({
   selector: 'app-budget',
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe, AmountInputDirective],
   templateUrl: './budget.component.html',
 })
 export class BudgetComponent implements OnInit {

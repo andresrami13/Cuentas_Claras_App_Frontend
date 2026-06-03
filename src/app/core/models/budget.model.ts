@@ -30,6 +30,7 @@ export interface UserBudgetConfig {
 export interface CreateCycleForm {
   startDate: string;
   endDate: string;
+  paymentDay?: number;
 }
 
 export interface AddCategoryForm {
