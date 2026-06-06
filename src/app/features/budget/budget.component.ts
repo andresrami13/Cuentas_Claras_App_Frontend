@@ -4,17 +4,28 @@ import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { BudgetService } from '../../core/services/budget.service';
+import { TransactionService } from '../../core/services/transaction.service';
 import { AuthService } from '../../core/services/auth.service';
 import { BudgetCategory, CreateCycleForm, AddCategoryForm, Periodicity, PERIODICITY_LABELS } from '../../core/models/budget.model';
+import { TransactionForm, INCOME_TYPES } from '../../core/models/transaction.model';
+
+const EMPTY_TX_FORM: TransactionForm = {
+  type: 'expense',
+  amount: null,
+  date: new Date().toISOString().split('T')[0],
+  budgetCategoryId: null,
+  incomeType: '',
+  description: '',
+};
 
 @Component({
   selector: 'app-budget',
   imports: [FormsModule, DecimalPipe, AmountInputDirective],
   templateUrl: './budget.component.html',
 })
-
 export class BudgetComponent implements OnInit {
   private budgetService = inject(BudgetService);
+  private txService = inject(TransactionService);
   private router = inject(Router);
   protected authService = inject(AuthService);
 
@@ -26,6 +37,7 @@ export class BudgetComponent implements OnInit {
 
   readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
   readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
+  readonly INCOME_TYPES = INCOME_TYPES;
 
   // Auto-creation state
   autoCreating = signal(false);
@@ -44,6 +56,12 @@ export class BudgetComponent implements OnInit {
   categoryForm: AddCategoryForm = { name: '', assigned: null };
   categoryLoading = signal(false);
   categoryError = signal<string | null>(null);
+
+  // New transaction modal
+  showTxForm = signal(false);
+  txForm: TransactionForm = { ...EMPTY_TX_FORM };
+  txFormLoading = signal(false);
+  txFormError = signal<string | null>(null);
 
   readonly isLoadingAny = computed(() => this.loading() || this.autoCreating());
 
@@ -98,6 +116,10 @@ export class BudgetComponent implements OnInit {
       .toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
   }
 
+  get budgetCategories(): BudgetCategory[] {
+    return this.budgetService.cycle()?.categories ?? [];
+  }
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   getSpentPct(cat: BudgetCategory): number {
@@ -119,6 +141,43 @@ export class BudgetComponent implements OnInit {
     if (!date) return '';
     const [y, m, d] = date.split('-');
     return `${d}/${m}/${y}`;
+  }
+
+  // ── New transaction modal ──────────────────────────────────────────────────
+
+  openTxForm(): void {
+    this.txForm = { ...EMPTY_TX_FORM, date: new Date().toISOString().split('T')[0] };
+    this.txFormError.set(null);
+    this.showTxForm.set(true);
+  }
+
+  closeTxForm(): void {
+    this.showTxForm.set(false);
+    this.txFormError.set(null);
+  }
+
+  onTxTypeChange(): void {
+    this.txForm.budgetCategoryId = null;
+    this.txForm.incomeType = '';
+  }
+
+  async saveTxForm(): Promise<void> {
+    const isExpense = this.txForm.type === 'expense';
+    if (!this.txForm.amount || !this.txForm.date) return;
+    if (isExpense && !this.txForm.budgetCategoryId) return;
+    if (!isExpense && !this.txForm.incomeType) return;
+
+    this.txFormLoading.set(true);
+    this.txFormError.set(null);
+    try {
+      await this.txService.add(this.txForm);
+      this.closeTxForm();
+      await this.budgetService.loadActiveCycle();
+    } catch (err: unknown) {
+      this.txFormError.set(err instanceof Error ? err.message : 'Error al guardar el movimiento');
+    } finally {
+      this.txFormLoading.set(false);
+    }
   }
 
   // ── Manual cycle creation (fallback) ──────────────────────────────────────
@@ -195,9 +254,5 @@ export class BudgetComponent implements OnInit {
 
   goToConfig(): void {
     this.router.navigate(['/budget/config']);
-  }
-
-  goToNewMovement(): void {
-    this.router.navigate(['/transactions']);
   }
 }

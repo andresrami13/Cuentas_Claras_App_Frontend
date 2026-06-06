@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../shared/directives/amount-input.directive';
@@ -28,14 +28,22 @@ export class BudgetConfigComponent implements OnInit {
   saveLoading = signal(false);
   saveError = signal<string | null>(null);
 
+  constructor() {
+    // Reactive sync: whenever config() signal changes, update form fields immediately
+    effect(() => {
+      const cfg = this.budgetService.config();
+      if (cfg) {
+        this.payDay = cfg.payDay;
+        this.periodicity = cfg.periodicity;
+        this.nextPayDate = cfg.nextPayDate;
+        this.fixedCategories = cfg.fixedCategories.map(fc => ({ ...fc }));
+      }
+    });
+  }
+
   async ngOnInit(): Promise<void> {
-    await this.budgetService.loadConfig();
-    const cfg = this.budgetService.config();
-    if (cfg) {
-      this.payDay = cfg.payDay;
-      this.periodicity = cfg.periodicity;
-      this.nextPayDate = cfg.nextPayDate;
-      this.fixedCategories = cfg.fixedCategories.map(fc => ({ ...fc }));
+    if (!this.budgetService.config()) {
+      await this.budgetService.loadConfig();
     }
   }
 
