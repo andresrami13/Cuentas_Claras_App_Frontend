@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "SpendApp": {
+    "cuentas-claras": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -66,10 +66,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "SpendApp:build:production"
+              "buildTarget": "cuentas-claras:build:production"
             },
             "development": {
-              "buildTarget": "SpendApp:build:development"
+              "buildTarget": "cuentas-claras:build:development"
             }
           },
           "defaultConfiguration": "development"
