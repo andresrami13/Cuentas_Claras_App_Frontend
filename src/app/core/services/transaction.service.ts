@@ -2,12 +2,10 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { lastValueFrom, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import {
-  Transaction, TransactionForm, TransactionFilter,
-  TransactionCategory, CATEGORY_LABELS,
-} from '../models/transaction.model';
+import { Transaction, TransactionForm, TransactionFilter } from '../models/transaction.model';
 import { ApiResponse } from '../models/user.model';
 import { AuthService } from './auth.service';
+import { BudgetService } from './budget.service';
 import { environment } from '../../../environments/environment';
 
 const API = environment.apiUrl;
@@ -16,7 +14,7 @@ interface FinancialRecordDto {
   financialRecordId?: number;
   userDocumentNumber?: string;
   recordType?: string;
-  category?: string;
+  budgetCategoryId?: number;
   description?: string;
   amount?: number;
   recordDate?: string;
@@ -24,26 +22,11 @@ interface FinancialRecordDto {
   periodicity?: string;
 }
 
-function toTransaction(dto: FinancialRecordDto): Transaction {
-  const categoryKey = (Object.entries(CATEGORY_LABELS).find(
-    ([, label]) => label.toLowerCase() === (dto.category ?? '').toLowerCase()
-  )?.[0] as TransactionCategory) ?? 'other';
-
-  return {
-    id: String(dto.financialRecordId),
-    type: dto.recordType === 'INCOME' ? 'income' : 'expense',
-    amount: dto.amount ?? 0,
-    date: dto.recordDate ?? '',
-    category: categoryKey,
-    description: dto.description,
-    createdAt: dto.recordDate ?? '',
-  };
-}
-
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
+  private readonly budgetSvc = inject(BudgetService);
 
   private readonly _transactions = signal<Transaction[]>([]);
   private readonly _loading = signal(false);
@@ -70,6 +53,25 @@ export class TransactionService {
     return throwError(() => new Error(msg));
   }
 
+  private toTransaction(dto: FinancialRecordDto): Transaction {
+    const isIncome = dto.recordType === 'INCOME';
+    const categories = this.budgetSvc.cycle()?.categories ?? [];
+    const budgetCategory = categories.find(c => Number(c.id) === dto.budgetCategoryId);
+
+    return {
+      id: String(dto.financialRecordId),
+      type: isIncome ? 'income' : 'expense',
+      amount: dto.amount ?? 0,
+      date: dto.recordDate ?? '',
+      budgetCategoryId: dto.budgetCategoryId ?? null,
+      categoryName: isIncome
+        ? (dto.description ?? 'Ingreso')
+        : (budgetCategory?.name ?? 'Sin categoría'),
+      description: isIncome ? undefined : (dto.description || undefined),
+      createdAt: dto.recordDate ?? '',
+    };
+  }
+
   async loadAll(): Promise<void> {
     this._loading.set(true);
     try {
@@ -78,18 +80,19 @@ export class TransactionService {
           `${API}/financial-records/users/${this.documentNumber}`
         ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
       );
-      this._transactions.set((res.data ?? []).map(toTransaction));
+      this._transactions.set((res.data ?? []).map(dto => this.toTransaction(dto)));
     } finally {
       this._loading.set(false);
     }
   }
 
   async add(form: TransactionForm): Promise<void> {
-    const endpoint = form.type === 'income' ? 'incomes' : 'expenses';
+    const isExpense = form.type === 'expense';
+    const endpoint = isExpense ? 'expenses' : 'incomes';
     const body: FinancialRecordDto = {
       userDocumentNumber: this.documentNumber,
-      category: CATEGORY_LABELS[form.category as TransactionCategory] ?? form.category,
-      description: form.description || undefined,
+      budgetCategoryId: isExpense ? form.budgetCategoryId! : undefined,
+      description: isExpense ? (form.description || undefined) : form.incomeType,
       amount: form.amount!,
       recordDate: form.date,
       recurring: false,
@@ -99,15 +102,16 @@ export class TransactionService {
         `${API}/financial-records/${endpoint}`, body
       ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
     );
-    this._transactions.update(list => [toTransaction(res.data), ...list]);
+    this._transactions.update(list => [this.toTransaction(res.data), ...list]);
   }
 
   async update(id: string, form: TransactionForm): Promise<void> {
+    const isExpense = form.type === 'expense';
     const body: FinancialRecordDto = {
       userDocumentNumber: this.documentNumber,
-      recordType: form.type === 'income' ? 'INCOME' : 'EXPENSE',
-      category: CATEGORY_LABELS[form.category as TransactionCategory] ?? form.category,
-      description: form.description || undefined,
+      recordType: isExpense ? 'EXPENSE' : 'INCOME',
+      budgetCategoryId: isExpense ? form.budgetCategoryId! : undefined,
+      description: isExpense ? (form.description || undefined) : form.incomeType,
       amount: form.amount!,
       recordDate: form.date,
       recurring: false,
@@ -118,7 +122,7 @@ export class TransactionService {
       ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
     );
     this._transactions.update(list =>
-      list.map(t => t.id === id ? toTransaction(res.data) : t)
+      list.map(t => t.id === id ? this.toTransaction(res.data) : t)
     );
   }
 
@@ -133,7 +137,7 @@ export class TransactionService {
   filter(filters: TransactionFilter): Transaction[] {
     return this._transactions().filter(t => {
       if (filters.type !== 'all' && t.type !== filters.type) return false;
-      if (filters.category !== 'all' && t.category !== filters.category) return false;
+      if (filters.budgetCategoryId !== 'all' && t.budgetCategoryId !== filters.budgetCategoryId) return false;
       if (filters.dateFrom && t.date < filters.dateFrom) return false;
       if (filters.dateTo && t.date > filters.dateTo) return false;
       return true;
@@ -157,10 +161,11 @@ export class TransactionService {
   getByCategory(): { category: string; label: string; amount: number; type: string }[] {
     const map = new Map<string, { label: string; amount: number; type: string }>();
     this._transactions().forEach(t => {
-      if (!map.has(t.category)) {
-        map.set(t.category, { label: CATEGORY_LABELS[t.category], amount: 0, type: t.type });
+      const key = t.categoryName;
+      if (!map.has(key)) {
+        map.set(key, { label: t.categoryName, amount: 0, type: t.type });
       }
-      map.get(t.category)!.amount += t.amount;
+      map.get(key)!.amount += t.amount;
     });
     return Array.from(map.entries())
       .map(([category, data]) => ({ category, ...data }))

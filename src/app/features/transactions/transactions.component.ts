@@ -3,25 +3,25 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { TransactionService } from '../../core/services/transaction.service';
+import { BudgetService } from '../../core/services/budget.service';
 import { AuthService } from '../../core/services/auth.service';
+import { BudgetCategory } from '../../core/models/budget.model';
 import {
-  Transaction, TransactionForm, TransactionFilter,
-  TransactionType, TransactionCategory,
-  ALL_CATEGORIES, INCOME_CATEGORIES, EXPENSE_CATEGORIES,
-  CATEGORY_LABELS, CATEGORY_ICONS,
+  Transaction, TransactionForm, TransactionFilter, INCOME_TYPES,
 } from '../../core/models/transaction.model';
 
 const EMPTY_FORM: TransactionForm = {
   type: 'expense',
   amount: null,
   date: new Date().toISOString().split('T')[0],
-  category: '',
+  budgetCategoryId: null,
+  incomeType: '',
   description: '',
 };
 
 const EMPTY_FILTER: TransactionFilter = {
   type: 'all',
-  category: 'all',
+  budgetCategoryId: 'all',
   dateFrom: '',
   dateTo: '',
 };
@@ -34,6 +34,7 @@ const EMPTY_FILTER: TransactionFilter = {
 export class TransactionsComponent implements OnInit {
   private txService = inject(TransactionService);
   private authService = inject(AuthService);
+  private budgetService = inject(BudgetService);
 
   readonly user = this.authService.user;
   readonly loading = this.txService.loading;
@@ -41,17 +42,17 @@ export class TransactionsComponent implements OnInit {
   readonly totalExpenses = this.txService.totalExpenses;
   readonly balance = this.txService.balance;
 
-  readonly CATEGORY_LABELS = CATEGORY_LABELS;
-  readonly CATEGORY_ICONS = CATEGORY_ICONS;
-  readonly ALL_CATEGORIES = ALL_CATEGORIES;
-  readonly INCOME_CATEGORIES = INCOME_CATEGORIES;
-  readonly EXPENSE_CATEGORIES = EXPENSE_CATEGORIES;
+  readonly INCOME_TYPES = INCOME_TYPES;
 
   filter: TransactionFilter = { ...EMPTY_FILTER };
   showFilters = signal(false);
 
   get filteredTransactions(): Transaction[] {
     return this.txService.filter(this.filter);
+  }
+
+  get budgetCategories(): BudgetCategory[] {
+    return this.budgetService.cycle()?.categories ?? [];
   }
 
   showForm = signal(false);
@@ -62,11 +63,8 @@ export class TransactionsComponent implements OnInit {
   deleteConfirmId = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
+    await this.budgetService.loadActiveCycle();
     await this.txService.loadAll();
-  }
-
-  get availableCategories(): TransactionCategory[] {
-    return this.form.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   }
 
   openAddForm(): void {
@@ -77,7 +75,14 @@ export class TransactionsComponent implements OnInit {
 
   openEditForm(tx: Transaction): void {
     this.editingId.set(tx.id);
-    this.form = { type: tx.type, amount: tx.amount, date: tx.date, category: tx.category, description: tx.description ?? '' };
+    this.form = {
+      type: tx.type,
+      amount: tx.amount,
+      date: tx.date,
+      budgetCategoryId: tx.budgetCategoryId,
+      incomeType: tx.type === 'income' ? (tx.categoryName ?? '') : '',
+      description: tx.type === 'expense' ? (tx.description ?? '') : '',
+    };
     this.showForm.set(true);
   }
 
@@ -88,7 +93,11 @@ export class TransactionsComponent implements OnInit {
   }
 
   async saveForm(): Promise<void> {
-    if (!this.form.amount || !this.form.date || !this.form.category) return;
+    const isExpense = this.form.type === 'expense';
+    if (!this.form.amount || !this.form.date) return;
+    if (isExpense && !this.form.budgetCategoryId) return;
+    if (!isExpense && !this.form.incomeType) return;
+
     this.formLoading.set(true);
     this.formError.set(null);
     try {
@@ -127,7 +136,8 @@ export class TransactionsComponent implements OnInit {
   }
 
   onTypeChange(): void {
-    this.form.category = '';
+    this.form.budgetCategoryId = null;
+    this.form.incomeType = '';
   }
 
   formatCurrency(amount: number): string {

@@ -1,7 +1,6 @@
 import { Component, inject, computed, OnInit } from '@angular/core';
 import { NgxApexchartsModule } from 'ngx-apexcharts';
 import { TransactionService } from '../../core/services/transaction.service';
-import { CATEGORY_LABELS } from '../../core/models/transaction.model';
 
 @Component({
   selector: 'app-reports',
@@ -50,7 +49,7 @@ export class ReportsComponent implements OnInit {
 
   private buildCategoryChart(): void {
     const data = this.txService.getByCategory();
-    const labels = data.map(d => CATEGORY_LABELS[d.category as keyof typeof CATEGORY_LABELS] || d.category);
+    const labels = data.map(d => d.label);
     const amounts = data.map(d => d.amount);
     const colors = data.map(d => d.type === 'income' ? '#28B463' : '#CB4335');
 

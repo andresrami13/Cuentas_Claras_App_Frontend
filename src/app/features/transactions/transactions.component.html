@@ -100,16 +100,18 @@
             <option value="expense">Egreso</option>
           </select>
         </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
-          <select [(ngModel)]="filter.category"
-            class="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none">
-            <option value="all">Todas</option>
-            @for (cat of ALL_CATEGORIES; track cat) {
-              <option [value]="cat">{{ CATEGORY_LABELS[cat] }}</option>
-            }
-          </select>
-        </div>
+        @if (filter.type === 'expense') {
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+            <select [(ngModel)]="filter.budgetCategoryId"
+              class="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none">
+              <option [ngValue]="'all'">Todas</option>
+              @for (cat of budgetCategories; track cat.id) {
+                <option [ngValue]="+cat.id">{{ cat.name }}</option>
+              }
+            </select>
+          </div>
+        }
         <div>
           <label class="block text-xs font-medium text-gray-500 mb-1">Desde</label>
           <input type="date" [(ngModel)]="filter.dateFrom"
@@ -149,16 +151,18 @@
         @for (tx of filteredTransactions; track tx.id) {
           <div class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors group">
             <!-- Category Icon -->
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg"
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold"
               [class.bg-[#28B463]/10]="tx.type === 'income'"
-              [class.bg-[#CB4335]/10]="tx.type === 'expense'">
-              {{ CATEGORY_ICONS[tx.category] }}
+              [class.text-[#28B463]]="tx.type === 'income'"
+              [class.bg-[#CB4335]/10]="tx.type === 'expense'"
+              [class.text-[#CB4335]]="tx.type === 'expense'">
+              {{ tx.categoryName.charAt(0).toUpperCase() }}
             </div>
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-[#1C2833] truncate">
-                {{ tx.description || CATEGORY_LABELS[tx.category] }}
+                {{ tx.description || tx.categoryName }}
               </p>
               <div class="flex items-center gap-1.5 mt-0.5">
                 <span class="text-xs text-gray-400">{{ tx.date | date:'dd/MM/yyyy' }}</span>
@@ -168,7 +172,7 @@
                   [class.text-[#28B463]]="tx.type === 'income'"
                   [class.bg-[#CB4335]/10]="tx.type === 'expense'"
                   [class.text-[#CB4335]]="tx.type === 'expense'">
-                  {{ CATEGORY_LABELS[tx.category] }}
+                  {{ tx.categoryName }}
                 </span>
               </div>
             </div>
@@ -273,17 +277,39 @@
             class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
         </div>
 
-        <!-- Category -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
-          <select [(ngModel)]="form.category"
-            class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
-            <option value="">Selecciona una categoría</option>
-            @for (cat of availableCategories; track cat) {
-              <option [value]="cat">{{ CATEGORY_ICONS[cat] }} {{ CATEGORY_LABELS[cat] }}</option>
+        <!-- Category (expense) -->
+        @if (form.type === 'expense') {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría <span class="text-red-400">*</span></label>
+            @if (budgetCategories.length === 0) {
+              <p class="text-sm text-amber-600 bg-amber-50 px-3 py-2.5 rounded-lg border border-amber-200">
+                No hay ciclo de presupuesto activo. Crea uno en la sección Presupuesto.
+              </p>
+            } @else {
+              <select [(ngModel)]="form.budgetCategoryId"
+                class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+                <option [ngValue]="null">Selecciona una categoría</option>
+                @for (cat of budgetCategories; track cat.id) {
+                  <option [ngValue]="+cat.id">{{ cat.name }}</option>
+                }
+              </select>
             }
-          </select>
-        </div>
+          </div>
+        }
+
+        <!-- Income type -->
+        @if (form.type === 'income') {
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipo de ingreso <span class="text-red-400">*</span></label>
+            <select [(ngModel)]="form.incomeType"
+              class="block w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] bg-gray-50 focus:bg-white transition-colors outline-none">
+              <option value="">Selecciona un tipo</option>
+              @for (t of INCOME_TYPES; track t.value) {
+                <option [value]="t.value">{{ t.label }}</option>
+              }
+            </select>
+          </div>
+        }
 
         <!-- Description -->
         <div>
@@ -305,7 +331,7 @@
             Cancelar
           </button>
           <button type="button" (click)="saveForm()"
-            [disabled]="!form.amount || !form.date || !form.category || formLoading()"
+            [disabled]="!form.amount || !form.date || (form.type === 'expense' && !form.budgetCategoryId) || (form.type === 'income' && !form.incomeType) || formLoading()"
             class="flex-1 py-3 rounded-xl text-sm font-bold text-[#1C2833] bg-[#D4A017] hover:bg-[#F0C040] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             @if (formLoading()) {
               <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
