@@ -5,16 +5,14 @@ import { DecimalPipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { BudgetService } from '../../core/services/budget.service';
 import { AuthService } from '../../core/services/auth.service';
-import { BudgetCategory, CreateCycleForm, AddCategoryForm } from '../../core/models/budget.model';
-import {
-  EXPENSE_CATEGORIES, CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory,
-} from '../../core/models/transaction.model';
+import { BudgetCategory, CreateCycleForm, AddCategoryForm, Periodicity, PERIODICITY_LABELS } from '../../core/models/budget.model';
 
 @Component({
   selector: 'app-budget',
   imports: [FormsModule, DecimalPipe, AmountInputDirective],
   templateUrl: './budget.component.html',
 })
+
 export class BudgetComponent implements OnInit {
   private budgetService = inject(BudgetService);
   private router = inject(Router);
@@ -26,9 +24,8 @@ export class BudgetComponent implements OnInit {
   readonly totalSpent = this.budgetService.totalSpent;
   readonly totalAvailable = this.budgetService.totalAvailable;
 
-  readonly EXPENSE_CATEGORIES = EXPENSE_CATEGORIES;
-  readonly CATEGORY_LABELS = CATEGORY_LABELS;
-  readonly CATEGORY_ICONS = CATEGORY_ICONS;
+  readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
+  readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
 
   // Auto-creation state
   autoCreating = signal(false);
@@ -37,7 +34,7 @@ export class BudgetComponent implements OnInit {
 
   // Manual cycle creation (fallback si auto-creación falla)
   showCreateForm = signal(false);
-  createForm: CreateCycleForm = { startDate: '', endDate: '' };
+  createForm: CreateCycleForm = { paymentDay: 15, periodicity: 'MONTHLY' };
   createLoading = signal(false);
   createError = signal<string | null>(null);
 
@@ -108,11 +105,8 @@ export class BudgetComponent implements OnInit {
     return Math.min((cat.spent / cat.assigned) * 100, 100);
   }
 
-  getCategoryIcon(name: string): string {
-    const key = Object.entries(CATEGORY_LABELS).find(
-      ([, label]) => label === name
-    )?.[0] as TransactionCategory | undefined;
-    return key ? CATEGORY_ICONS[key] : '📁';
+  getCategoryIcon(_name: string): string {
+    return '📁';
   }
 
   formatCurrency(amount: number): string {
@@ -131,8 +125,10 @@ export class BudgetComponent implements OnInit {
 
   openCreateForm(): void {
     const cfg = this.budgetService.config();
-    const startDate = cfg?.nextPayDate || new Date().toISOString().split('T')[0];
-    this.createForm = { startDate, endDate: '' };
+    this.createForm = {
+      paymentDay: cfg?.payDay ?? 15,
+      periodicity: cfg?.periodicity ?? 'MONTHLY',
+    };
     this.createError.set(null);
     this.showCreateForm.set(true);
   }
@@ -143,7 +139,7 @@ export class BudgetComponent implements OnInit {
   }
 
   async submitCreateCycle(): Promise<void> {
-    if (!this.createForm.startDate || !this.createForm.endDate) return;
+    if (!this.createForm.paymentDay || !this.createForm.periodicity) return;
     this.createLoading.set(true);
     this.createError.set(null);
     try {

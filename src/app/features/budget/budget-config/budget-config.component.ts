@@ -3,8 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../shared/directives/amount-input.directive';
 import { BudgetService } from '../../../core/services/budget.service';
-import { FixedBudgetCategory } from '../../../core/models/budget.model';
-import { EXPENSE_CATEGORIES, CATEGORY_LABELS, CATEGORY_ICONS } from '../../../core/models/transaction.model';
+import { FixedBudgetCategory, Periodicity, PERIODICITY_LABELS } from '../../../core/models/budget.model';
 
 @Component({
   selector: 'app-budget-config',
@@ -15,11 +14,11 @@ export class BudgetConfigComponent implements OnInit {
   private budgetService = inject(BudgetService);
   private router = inject(Router);
 
-  readonly EXPENSE_CATEGORIES = EXPENSE_CATEGORIES;
-  readonly CATEGORY_LABELS = CATEGORY_LABELS;
-  readonly CATEGORY_ICONS = CATEGORY_ICONS;
+  readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
+  readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
 
-  payDay = 1;
+  payDay = 15;
+  periodicity: Periodicity = 'MONTHLY';
   nextPayDate = '';
   fixedCategories: FixedBudgetCategory[] = [];
 
@@ -34,6 +33,7 @@ export class BudgetConfigComponent implements OnInit {
     const cfg = this.budgetService.config();
     if (cfg) {
       this.payDay = cfg.payDay;
+      this.periodicity = cfg.periodicity;
       this.nextPayDate = cfg.nextPayDate;
       this.fixedCategories = cfg.fixedCategories.map(fc => ({ ...fc }));
     }
@@ -51,11 +51,8 @@ export class BudgetConfigComponent implements OnInit {
     this.fixedCategories.splice(index, 1);
   }
 
-  getCategoryIcon(name: string): string {
-    const key = Object.entries(CATEGORY_LABELS).find(
-      ([, label]) => label === name
-    )?.[0];
-    return key ? CATEGORY_ICONS[key as keyof typeof CATEGORY_ICONS] : '📁';
+  getCategoryIcon(_name: string): string {
+    return '📁';
   }
 
   formatCurrency(amount: number): string {
@@ -65,13 +62,14 @@ export class BudgetConfigComponent implements OnInit {
   }
 
   async save(): Promise<void> {
-    if (!this.payDay || !this.nextPayDate) return;
+    if (!this.payDay || !this.nextPayDate || !this.periodicity) return;
     this.saveLoading.set(true);
     this.saveError.set(null);
     try {
       await this.budgetService.saveConfig({
         documentNumber: '',
         payDay: this.payDay,
+        periodicity: this.periodicity,
         nextPayDate: this.nextPayDate,
         fixedCategories: this.fixedCategories,
       });

@@ -4,7 +4,7 @@ import { lastValueFrom, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
   BudgetCycle, BudgetCategory, UserBudgetConfig,
-  CreateCycleForm, AddCategoryForm,
+  CreateCycleForm, AddCategoryForm, Periodicity,
 } from '../models/budget.model';
 import { ApiResponse } from '../models/user.model';
 import { AuthService } from './auth.service';
@@ -18,6 +18,7 @@ interface BudgetCycleDto {
   startDate?: string;
   endDate?: string;
   paymentDay?: number;
+  periodicity?: string;
   status?: string;
   categories?: BudgetCategoryDto[];
 }
@@ -41,22 +42,12 @@ interface UserBudgetConfigDto {
   id?: number;
   userDocumentNumber?: string;
   paymentDay?: number;
+  periodicity?: string;
   nextPaymentDate?: string;
   fixedCategories?: FixedBudgetCategoryDto[];
 }
 
-// ── Date helpers ─────────────────────────────────────────────────────────────
-
-function calcCycleEndDate(startDate: string, payDay: number): string {
-  const start = new Date(startDate + 'T00:00:00');
-  const nextYear = start.getMonth() === 11 ? start.getFullYear() + 1 : start.getFullYear();
-  const nextMonth = (start.getMonth() + 1) % 12;
-  const lastDayOfNextMonth = new Date(nextYear, nextMonth + 1, 0).getDate();
-  const actualPayDay = Math.min(payDay, lastDayOfNextMonth);
-  const nextPayMs = new Date(nextYear, nextMonth, actualPayDay).getTime();
-  const end = new Date(nextPayMs - 86_400_000); // día anterior al próximo pago
-  return end.toISOString().split('T')[0];
-}
+// ── Date helper ───────────────────────────────────────────────────────────────
 
 function calcNextPayDate(payDay: number, cycleStartDate: string): string {
   const start = new Date(cycleStartDate + 'T00:00:00');
@@ -77,7 +68,7 @@ function toCategory(dto: BudgetCategoryDto): BudgetCategory {
     name: dto.categoryName ?? '',
     assigned,
     spent,
-    available: assigned - spent,
+    available: dto.availableAmount ?? (assigned - spent),
   };
 }
 
@@ -96,6 +87,7 @@ function toConfig(dto: UserBudgetConfigDto): UserBudgetConfig {
   return {
     documentNumber: dto.userDocumentNumber ?? '',
     payDay: dto.paymentDay ?? 1,
+    periodicity: (dto.periodicity as Periodicity) ?? 'MONTHLY',
     nextPayDate: dto.nextPaymentDate ?? '',
     fixedCategories: (dto.fixedCategories ?? []).map(fc => ({
       name: fc.categoryName ?? '',
@@ -153,12 +145,10 @@ export class BudgetService {
   }
 
   async createCycle(form: CreateCycleForm): Promise<void> {
-    const body: BudgetCycleDto = {
+    const body = {
       userDocumentNumber: this.documentNumber,
-      startDate: form.startDate,
-      endDate: form.endDate,
       paymentDay: form.paymentDay,
-      status: 'ACTIVE',
+      periodicity: form.periodicity,
     };
     const res = await lastValueFrom(
       this.http.post<ApiResponse<BudgetCycleDto>>(`${API}/budget-cycles`, body)
@@ -206,19 +196,19 @@ export class BudgetService {
     const config = this._config();
     if (!config) throw new Error('No hay configuración de presupuesto');
 
-    const startDate = config.nextPayDate || new Date().toISOString().split('T')[0];
-    const endDate = calcCycleEndDate(startDate, config.payDay);
-
     this._loading.set(true);
     try {
-      await this.createCycle({ startDate, endDate, paymentDay: config.payDay });
+      await this.createCycle({ paymentDay: config.payDay, periodicity: config.periodicity });
 
       for (const fc of config.fixedCategories) {
         await this.addCategory({ name: fc.name, assigned: fc.amount });
       }
 
-      const newNextPayDate = calcNextPayDate(config.payDay, startDate);
-      await this.saveConfig({ ...config, nextPayDate: newNextPayDate });
+      const cycleStart = this._cycle()?.startDate;
+      if (cycleStart) {
+        const newNextPayDate = calcNextPayDate(config.payDay, cycleStart);
+        await this.saveConfig({ ...config, nextPayDate: newNextPayDate });
+      }
     } finally {
       this._loading.set(false);
     }
@@ -256,6 +246,7 @@ export class BudgetService {
     const body: UserBudgetConfigDto = {
       userDocumentNumber: this.documentNumber,
       paymentDay: data.payDay,
+      periodicity: data.periodicity,
       nextPaymentDate: data.nextPayDate,
       fixedCategories: data.fixedCategories.map(fc => ({
         categoryName: fc.name,

@@ -1,3 +1,11 @@
+export type Periodicity = 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
+
+export const PERIODICITY_LABELS: Record<Periodicity, string> = {
+  WEEKLY: 'Semanal',
+  BIWEEKLY: 'Quincenal',
+  MONTHLY: 'Mensual',
+};
+
 export interface BudgetCycle {
   id: string;
   documentNumber: string;
@@ -23,14 +31,14 @@ export interface FixedBudgetCategory {
 export interface UserBudgetConfig {
   documentNumber: string;
   payDay: number;
+  periodicity: Periodicity;
   nextPayDate: string;
   fixedCategories: FixedBudgetCategory[];
 }
 
 export interface CreateCycleForm {
-  startDate: string;
-  endDate: string;
-  paymentDay?: number;
+  paymentDay: number;
+  periodicity: Periodicity;
 }
 
 export interface AddCategoryForm {
