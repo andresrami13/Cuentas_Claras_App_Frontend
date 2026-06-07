@@ -2,27 +2,27 @@
 
   <!-- Header -->
   <div class="mb-6">
-    <h1 class="text-xl md:text-2xl font-bold text-[#1C2833] flex items-center gap-2">
+    <h1 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
       <img src="https://i.ibb.co/60kjzFsJ/Gemini-Generated-Image-gzmgxugzmgxugzmg-removebg-preview.webp" alt="Coach IA" class="w-8 h-8 object-contain"/>
       Coach Financiero IA
     </h1>
-    <p class="text-sm text-gray-500 mt-0.5">Análisis personalizado de tus finanzas</p>
+    <p class="text-sm text-white/70 mt-0.5">Análisis personalizado de tus finanzas</p>
   </div>
 
   <!-- Skeleton de carga inicial -->
   @if (initializing()) {
     <div class="space-y-4 animate-pulse">
       <div class="flex gap-2">
-        <div class="bg-gray-200 rounded-full h-9 w-32"></div>
-        <div class="bg-gray-200 rounded-full h-9 w-40"></div>
-        <div class="bg-gray-200 rounded-full h-9 w-28"></div>
+        <div class="bg-white/10 rounded-full h-9 w-32"></div>
+        <div class="bg-white/10 rounded-full h-9 w-40"></div>
+        <div class="bg-white/10 rounded-full h-9 w-28"></div>
       </div>
-      <div class="bg-gray-200 rounded-2xl h-44"></div>
+      <div class="bg-white/10 rounded-2xl h-44"></div>
       <div class="grid grid-cols-2 gap-3">
-        <div class="bg-gray-200 rounded-2xl h-16"></div>
-        <div class="bg-gray-200 rounded-2xl h-16"></div>
+        <div class="bg-white/10 rounded-2xl h-16"></div>
+        <div class="bg-white/10 rounded-2xl h-16"></div>
       </div>
-      <div class="bg-gray-200 rounded-2xl h-56"></div>
+      <div class="bg-white/10 rounded-2xl h-56"></div>
     </div>
   }
 
@@ -30,12 +30,12 @@
 
     <!-- Sin metas creadas -->
     @if (goals().length === 0) {
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+      <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-8 text-center">
         <div class="text-5xl mb-4">🎯</div>
-        <h2 class="font-bold text-[#1C2833] text-lg mb-2">No tienes metas financieras</h2>
-        <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">El coach necesita una meta para analizar tu progreso y darte recomendaciones personalizadas.</p>
+        <h2 class="font-bold text-white text-lg mb-2">No tienes metas financieras</h2>
+        <p class="text-sm text-white/70 max-w-xs mx-auto mb-6">El coach necesita una meta para analizar tu progreso y darte recomendaciones personalizadas.</p>
         <a routerLink="/goals"
-          class="inline-flex items-center gap-2 bg-[#D4A017] text-[#1C2833] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#F0C040] transition-colors">
+          class="inline-flex items-center gap-2 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] font-semibold text-sm px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-95">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
           </svg>
@@ -48,24 +48,24 @@
 
       <!-- Selector de metas -->
       <div class="mb-5">
-        <p class="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Selecciona una meta</p>
+        <p class="text-xs font-medium text-white/50 mb-2 uppercase tracking-wide">Selecciona una meta</p>
         <div class="flex gap-2 overflow-x-auto pb-1">
           @for (goal of goals(); track goal.id) {
             <button
               type="button"
               (click)="selectGoal(goal)"
               class="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium border transition-colors"
-              [class.bg-[#1C2833]]="selectedGoal()?.id === goal.id"
-              [class.text-[#D4A017]]="selectedGoal()?.id === goal.id"
-              [class.border-[#1C2833]]="selectedGoal()?.id === goal.id"
-              [class.bg-white]="selectedGoal()?.id !== goal.id"
-              [class.text-gray-600]="selectedGoal()?.id !== goal.id"
-              [class.border-gray-200]="selectedGoal()?.id !== goal.id"
-              [class.hover:border-gray-400]="selectedGoal()?.id !== goal.id">
+              [class.bg-white/20]="selectedGoal()?.id === goal.id"
+              [class.text-cyan-300]="selectedGoal()?.id === goal.id"
+              [class.border-cyan-400/50]="selectedGoal()?.id === goal.id"
+              [class.bg-white/10]="selectedGoal()?.id !== goal.id"
+              [class.text-white/70]="selectedGoal()?.id !== goal.id"
+              [class.border-white/20]="selectedGoal()?.id !== goal.id"
+              [class.hover:border-white/40]="selectedGoal()?.id !== goal.id">
               <span class="text-base leading-none">🎯</span>
               <span class="truncate max-w-36">{{ goal.name }}</span>
               @if (goal.status === 'ACTIVE') {
-                <span class="w-1.5 h-1.5 rounded-full bg-[#28B463] flex-shrink-0"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
               }
             </button>
           }
@@ -75,20 +75,20 @@
       @if (selectedGoal(); as goal) {
 
         <!-- Chat -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
-          <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+        <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl overflow-hidden mb-4">
+          <div class="px-5 py-4 border-b border-white/10 flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-white flex items-center justify-center overflow-hidden">
               <img src="https://i.ibb.co/60kjzFsJ/Gemini-Generated-Image-gzmgxugzmgxugzmg-removebg-preview.webp" alt="Coach IA" class="w-6 h-6 object-contain"/>
             </div>
-            <h3 class="font-semibold text-[#1C2833] text-sm">Coach IA — {{ goal.name }}</h3>
+            <h3 class="font-semibold text-white text-sm">Coach IA — {{ goal.name }}</h3>
           </div>
 
           <!-- Mensajes -->
           @if (messages().length === 0) {
             <div class="flex flex-col items-center justify-center py-12 px-6 text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#D4A017]/10 flex items-center justify-center text-3xl mb-4">💡</div>
-              <p class="text-gray-700 font-medium mb-1">Pregúntale a tu coach</p>
-              <p class="text-gray-400 text-sm">Usa las sugerencias o escribe tu propia pregunta sobre esta meta.</p>
+              <div class="w-16 h-16 rounded-2xl bg-cyan-400/10 flex items-center justify-center text-3xl mb-4">💡</div>
+              <p class="text-white font-medium mb-1">Pregúntale a tu coach</p>
+              <p class="text-white/50 text-sm">Usa las sugerencias o escribe tu propia pregunta sobre esta meta.</p>
             </div>
           } @else {
             <div class="px-5 py-4 space-y-4 max-h-96 overflow-y-auto">
@@ -97,10 +97,10 @@
                 @if (msg.role === 'user') {
                   <div class="flex justify-end">
                     <div class="max-w-[80%]">
-                      <div class="bg-[#1C2833] rounded-2xl rounded-tr-md px-4 py-3">
+                      <div class="bg-[#1A3A6E]/80 rounded-2xl rounded-tr-md px-4 py-3">
                         <p class="text-sm text-white leading-relaxed">{{ msg.content }}</p>
                       </div>
-                      <p class="text-xs text-gray-400 mt-1 text-right mr-1">{{ formatTime(msg.timestamp) }}</p>
+                      <p class="text-xs text-white/40 mt-1 text-right mr-1">{{ formatTime(msg.timestamp) }}</p>
                     </div>
                   </div>
                 }
@@ -112,21 +112,21 @@
                     </div>
                     <div class="flex-1">
                       @if (msg.isLoading) {
-                        <div class="bg-[#F2F3F4] rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-2">
+                        <div class="bg-white/10 rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-2">
                           <div class="flex gap-1">
-                            <div class="w-2 h-2 rounded-full bg-[#D4A017] animate-bounce" style="animation-delay: 0ms"></div>
-                            <div class="w-2 h-2 rounded-full bg-[#D4A017] animate-bounce" style="animation-delay: 150ms"></div>
-                            <div class="w-2 h-2 rounded-full bg-[#D4A017] animate-bounce" style="animation-delay: 300ms"></div>
+                            <div class="w-2 h-2 rounded-full bg-cyan-300 animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 rounded-full bg-cyan-300 animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 rounded-full bg-cyan-300 animate-bounce" style="animation-delay: 300ms"></div>
                           </div>
-                          <span class="text-xs text-gray-400">Analizando...</span>
+                          <span class="text-xs text-white/50">Analizando...</span>
                         </div>
                       } @else {
-                        <div class="bg-[#F2F3F4] rounded-2xl rounded-tl-md px-4 py-3">
-                          <p class="text-sm text-[#1C2833] leading-relaxed"
+                        <div class="bg-white/10 rounded-2xl rounded-tl-md px-4 py-3">
+                          <p class="text-sm text-white leading-relaxed"
                             [innerHTML]="renderMarkdown(msg.content)">
                           </p>
                         </div>
-                        <p class="text-xs text-gray-400 mt-1 ml-1">{{ formatTime(msg.timestamp) }}</p>
+                        <p class="text-xs text-white/40 mt-1 ml-1">{{ formatTime(msg.timestamp) }}</p>
                       }
                     </div>
                   </div>
@@ -138,20 +138,20 @@
 
           <!-- Error de envío -->
           @if (sendError) {
-            <div class="mx-5 mb-3 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2.5 rounded-lg">
+            <div class="mx-5 mb-3 bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl">
               {{ sendError }}
             </div>
           }
 
           <!-- Input -->
-          <div class="px-5 py-4 border-t border-gray-100 space-y-3">
+          <div class="px-5 py-4 border-t border-white/10 space-y-3">
             <div class="flex flex-wrap gap-2">
               @for (s of suggestions; track s) {
                 <button
                   type="button"
                   (click)="applySuggestion(s)"
                   [disabled]="isLoading()"
-                  class="text-xs px-3 py-1.5 rounded-full border border-[#D4A017]/40 text-[#D4A017] bg-[#D4A017]/5 hover:bg-[#D4A017]/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                  class="text-xs px-3 py-1.5 rounded-full border border-cyan-400/40 text-cyan-300 bg-cyan-400/5 hover:bg-cyan-400/15 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                   {{ s }}
                 </button>
               }
@@ -164,13 +164,13 @@
                 (keydown.enter)="send()"
                 [disabled]="isLoading()"
                 placeholder="Escribe tu pregunta sobre esta meta..."
-                class="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-[#D4A017] focus:border-[#D4A017] outline-none bg-gray-50 focus:bg-white transition-colors disabled:opacity-50"
+                class="flex-1 text-sm bg-white/10 border border-white/25 rounded-xl px-3 py-2.5 text-white placeholder:text-white/40 focus:border-cyan-400/60 focus:outline-none transition-colors disabled:opacity-50"
               />
               <button
                 type="button"
                 (click)="send()"
                 [disabled]="!question.trim() || isLoading()"
-                class="w-11 h-11 rounded-xl bg-[#D4A017] text-[#1C2833] flex items-center justify-center hover:bg-[#F0C040] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0">
+                class="w-11 h-11 rounded-xl bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 active:scale-95">
                 @if (isLoading()) {
                   <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -187,7 +187,7 @@
         </div>
 
         <!-- Card de meta seleccionada -->
-        <div class="bg-[#1C2833] rounded-2xl p-5 mb-5 text-white shadow-lg">
+        <div class="bg-white/15 backdrop-blur-lg border border-white/25 rounded-2xl p-5 mb-5 text-white">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
               <div class="text-3xl">🎯</div>
@@ -200,14 +200,14 @@
               </div>
             </div>
             <div class="text-right flex-shrink-0">
-              <p class="text-2xl font-bold text-[#D4A017]">{{ progressPercent }}%</p>
+              <p class="text-2xl font-bold text-cyan-300">{{ progressPercent }}%</p>
               <p class="text-xs text-white/40">completado</p>
             </div>
           </div>
 
           <div class="mb-4">
             <div class="h-2 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full bg-[#D4A017] rounded-full transition-all duration-700"
+              <div class="h-full bg-cyan-400 rounded-full transition-all duration-700"
                 [style.width.%]="progressPercent">
               </div>
             </div>
@@ -216,7 +216,7 @@
           <div class="grid grid-cols-3 gap-3">
             <div class="bg-white/5 rounded-xl p-3 text-center">
               <p class="text-xs text-white/40 mb-1">Acumulado</p>
-              <p class="text-sm font-bold text-[#28B463]">{{ formatCurrency(goal.currentAmount) }}</p>
+              <p class="text-sm font-bold text-emerald-300">{{ formatCurrency(goal.currentAmount) }}</p>
             </div>
             <div class="bg-white/5 rounded-xl p-3 text-center">
               <p class="text-xs text-white/40 mb-1">Meta total</p>
@@ -225,8 +225,8 @@
             <div class="bg-white/5 rounded-xl p-3 text-center">
               <p class="text-xs text-white/40 mb-1">Días restantes</p>
               <p class="text-sm font-bold"
-                [class.text-[#D4A017]]="daysLeft > 30"
-                [class.text-[#CB4335]]="daysLeft <= 30">
+                [class.text-cyan-300]="daysLeft > 30"
+                [class.text-red-300]="daysLeft <= 30">
                 {{ daysLeft }}
               </p>
             </div>
@@ -235,23 +235,23 @@
 
         <!-- Resumen financiero -->
         <div class="grid grid-cols-2 gap-3 mb-5">
-          <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <p class="text-xs text-gray-500 mb-1.5">Ingresos totales</p>
-            <p class="font-bold text-[#28B463] text-base">{{ formatCurrency(totalIncome()) }}</p>
+          <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+            <p class="text-xs text-white/70 mb-1.5">Ingresos totales</p>
+            <p class="font-bold text-emerald-300 text-base">{{ formatCurrency(totalIncome()) }}</p>
           </div>
-          <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <p class="text-xs text-gray-500 mb-1.5">Egresos totales</p>
-            <p class="font-bold text-[#CB4335] text-base">{{ formatCurrency(totalExpenses()) }}</p>
+          <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+            <p class="text-xs text-white/70 mb-1.5">Egresos totales</p>
+            <p class="font-bold text-red-300 text-base">{{ formatCurrency(totalExpenses()) }}</p>
           </div>
         </div>
 
         <!-- Tip -->
-        <div class="bg-[#D4A017]/10 border border-[#D4A017]/20 rounded-2xl p-4">
+        <div class="bg-cyan-400/10 border border-cyan-400/20 rounded-2xl p-4">
           <div class="flex items-start gap-3">
             <span class="text-xl mt-0.5">💡</span>
             <div>
-              <p class="text-sm font-semibold text-[#1C2833] mb-1">Tip financiero del día</p>
-              <p class="text-sm text-gray-600">La regla 50/30/20: destina el 50% de tus ingresos a necesidades, 30% a deseos y 20% a ahorro e inversiones. Es un punto de partida sólido para cualquier presupuesto personal.</p>
+              <p class="text-sm font-semibold text-white mb-1">Tip financiero del día</p>
+              <p class="text-sm text-white/70">La regla 50/30/20: destina el 50% de tus ingresos a necesidades, 30% a deseos y 20% a ahorro e inversiones. Es un punto de partida sólido para cualquier presupuesto personal.</p>
             </div>
           </div>
         </div>

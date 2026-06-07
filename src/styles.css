@@ -9,7 +9,9 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #F2F3F4;
+  background: linear-gradient(135deg, #1A3A6E 0%, #2563B0 50%, #06B6D4 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
 }
@@ -19,7 +21,18 @@ body {
   scrollbar-width: none;
 }
 
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-elevated {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
