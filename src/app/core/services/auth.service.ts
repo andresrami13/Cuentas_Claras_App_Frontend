@@ -25,8 +25,10 @@ export class AuthService {
     }
   }
 
-  private handleError(err: HttpErrorResponse) {
-    const msg = err.error?.message || 'Error inesperado, intenta de nuevo';
+  private handleError(err: unknown) {
+    if (err instanceof Error) return throwError(() => err);
+    const httpErr = err as HttpErrorResponse;
+    const msg = httpErr.error?.message || 'Error inesperado, intenta de nuevo';
     return throwError(() => new Error(msg));
   }
 

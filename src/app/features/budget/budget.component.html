@@ -147,19 +147,53 @@
 
       <!-- Tarjetas resumen -->
       <div class="grid grid-cols-3 gap-3 mb-6">
-        <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+
+        <!-- Balance -->
+        <div class="backdrop-blur-md rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]"
+          [class.bg-emerald-500/25]="balance() >= 0"
+          [class.border]="true"
+          [class.border-emerald-400/40]="balance() >= 0"
+          [class.bg-red-500/25]="balance() < 0"
+          [class.border-red-400/40]="balance() < 0">
           <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 rounded-lg bg-blue-400/20 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+              [class.bg-emerald-400/30]="balance() >= 0"
+              [class.bg-red-400/30]="balance() < 0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                [class.text-emerald-200]="balance() >= 0"
+                [class.text-red-200]="balance() < 0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
               </svg>
             </div>
-            <span class="text-xs text-white/70 font-medium hidden sm:block">Asignado</span>
+            <span class="text-xs font-semibold hidden sm:block"
+              [class.text-emerald-200]="balance() >= 0"
+              [class.text-red-200]="balance() < 0">Balance</span>
           </div>
-          <p class="text-blue-300 font-bold text-base md:text-lg leading-tight">{{ formatCurrency(totalAssigned()) }}</p>
-          <p class="text-xs text-white/50 mt-0.5 sm:hidden">Asignado</p>
+          <p class="font-bold text-base md:text-lg leading-tight"
+            [class.text-emerald-100]="balance() >= 0"
+            [class.text-red-100]="balance() < 0">
+            {{ formatCompact(balance()) }}
+          </p>
+          <p class="text-xs mt-0.5 sm:hidden"
+            [class.text-emerald-200]="balance() >= 0"
+            [class.text-red-200]="balance() < 0">Balance</p>
         </div>
 
+        <!-- Ingresos -->
+        <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-400/20 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+              </svg>
+            </div>
+            <span class="text-xs text-white/70 font-medium hidden sm:block">Ingresos</span>
+          </div>
+          <p class="text-emerald-300 font-bold text-base md:text-lg leading-tight">{{ formatCompact(totalIncome()) }}</p>
+          <p class="text-xs text-white/50 mt-0.5 sm:hidden">Ingresos</p>
+        </div>
+
+        <!-- Egresos -->
         <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
           <div class="flex items-center gap-2 mb-2">
             <div class="w-8 h-8 rounded-lg bg-red-400/20 flex items-center justify-center">
@@ -167,28 +201,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
               </svg>
             </div>
-            <span class="text-xs text-white/70 font-medium hidden sm:block">Gastado</span>
+            <span class="text-xs text-white/70 font-medium hidden sm:block">Egresos</span>
           </div>
-          <p class="text-red-300 font-bold text-base md:text-lg leading-tight">{{ formatCurrency(totalSpent()) }}</p>
-          <p class="text-xs text-white/50 mt-0.5 sm:hidden">Gastado</p>
+          <p class="text-red-300 font-bold text-base md:text-lg leading-tight">{{ formatCompact(totalExpenses()) }}</p>
+          <p class="text-xs text-white/50 mt-0.5 sm:hidden">Egresos</p>
         </div>
 
-        <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 rounded-lg bg-cyan-400/20 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <span class="text-xs text-white/60 font-medium hidden sm:block">Disponible</span>
-          </div>
-          <p class="font-bold text-base md:text-lg leading-tight"
-            [class.text-emerald-300]="totalAvailable() >= 0"
-            [class.text-red-300]="totalAvailable() < 0">
-            {{ formatCurrency(totalAvailable()) }}
-          </p>
-          <p class="text-xs text-white/40 mt-0.5 sm:hidden">Disponible</p>
-        </div>
       </div>
 
       <!-- Lista de categorías -->
@@ -221,65 +239,197 @@
           </div>
         } @else {
           <div>
-            @for (cat of c.categories; track cat.id) {
-              <div class="px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors group">
-                <div class="flex items-start gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center flex-shrink-0 text-lg">
-                    {{ getCategoryIcon(cat.name) }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between mb-1.5">
-                      <span class="text-sm font-semibold text-white truncate">{{ cat.name }}</span>
-                      <div class="flex items-center gap-2 flex-shrink-0 ml-2">
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full"
-                          [class.bg-emerald-400/15]="getSpentPct(cat) < 70"
-                          [class.text-emerald-300]="getSpentPct(cat) < 70"
-                          [class.bg-amber-400/15]="getSpentPct(cat) >= 70 && getSpentPct(cat) < 90"
-                          [class.text-amber-300]="getSpentPct(cat) >= 70 && getSpentPct(cat) < 90"
-                          [class.bg-red-400/15]="getSpentPct(cat) >= 90"
-                          [class.text-red-300]="getSpentPct(cat) >= 90">
-                          {{ getSpentPct(cat) | number:'1.0-0' }}%
-                        </span>
-                        <button
-                          (click)="openEditCategory(cat)"
-                          class="hidden group-hover:flex p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                          </svg>
-                        </button>
+
+            <!-- Backdrop para cerrar menú -->
+            @if (openMenuCategoryId()) {
+              <div class="fixed inset-0 z-10" (click)="closeMenu()"></div>
+            }
+
+            <!-- Categorías activas -->
+            @for (cat of activeCategories; track cat.id) {
+              <div class="relative border-b border-white/10">
+                <!-- Área clickeable → abre modal de movimiento -->
+                <div
+                  (click)="openTxForm(cat.id)"
+                  class="px-4 py-4 hover:bg-white/5 active:bg-white/10 transition-colors cursor-pointer"
+                >
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center flex-shrink-0 text-lg">
+                      {{ getCategoryIcon(cat.name) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-sm font-semibold text-white truncate">{{ cat.name }}</span>
+                        <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                          <span class="text-xs font-bold px-2 py-0.5 rounded-full"
+                            [class.bg-emerald-400/15]="getSpentPct(cat) < 70"
+                            [class.text-emerald-300]="getSpentPct(cat) < 70"
+                            [class.bg-amber-400/15]="getSpentPct(cat) >= 70 && getSpentPct(cat) < 90"
+                            [class.text-amber-300]="getSpentPct(cat) >= 70 && getSpentPct(cat) < 90"
+                            [class.bg-red-400/15]="getSpentPct(cat) >= 90"
+                            [class.text-red-300]="getSpentPct(cat) >= 90">
+                            {{ getSpentPct(cat) | number:'1.0-0' }}%
+                          </span>
+                          <!-- Botón ⋮ -->
+                          <button
+                            (click)="$event.stopPropagation(); toggleMenu(cat.id)"
+                            class="relative z-20 p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div class="w-full bg-white/15 rounded-full h-2 mb-2">
-                      <div
-                        class="h-2 rounded-full transition-all duration-300"
-                        [class.bg-emerald-400]="getSpentPct(cat) < 70"
-                        [class.bg-amber-400]="getSpentPct(cat) >= 70 && getSpentPct(cat) < 90"
-                        [class.bg-red-400]="getSpentPct(cat) >= 90"
-                        [style.width.%]="getSpentPct(cat)"
-                      ></div>
-                    </div>
-                    <div class="flex items-center gap-3 text-xs text-white/50 flex-wrap">
-                      <span>
-                        <span class="font-medium text-red-300">{{ formatCurrency(cat.spent) }}</span> gastado
-                      </span>
-                      <span class="text-white/30">·</span>
-                      <span>
-                        <span class="font-medium text-white/70">{{ formatCurrency(cat.assigned) }}</span> asignado
-                      </span>
-                      <span class="text-white/30">·</span>
-                      <span>
-                        <span class="font-medium"
-                          [class.text-emerald-300]="cat.available >= 0"
-                          [class.text-red-300]="cat.available < 0">
-                          {{ formatCurrency(cat.available) }}
-                        </span> disponible
-                      </span>
+                      <div class="w-full bg-white/15 rounded-full h-2 mb-2">
+                        <div
+                          class="h-2 rounded-full transition-all duration-300"
+                          [class.bg-emerald-400]="getSpentPct(cat) < 70"
+                          [class.bg-amber-400]="getSpentPct(cat) >= 70 && getSpentPct(cat) < 90"
+                          [class.bg-red-400]="getSpentPct(cat) >= 90"
+                          [style.width.%]="getSpentPct(cat)"
+                        ></div>
+                      </div>
+                      <div class="flex items-center gap-3 text-xs text-white/50 flex-wrap">
+                        <span>
+                          <span class="font-medium text-red-300">{{ formatCurrency(cat.spent) }}</span> gastado
+                        </span>
+                        <span class="text-white/30">·</span>
+                        <span>
+                          <span class="font-medium text-white/70">{{ formatCurrency(cat.assigned) }}</span> asignado
+                        </span>
+                        <span class="text-white/30">·</span>
+                        <span>
+                          <span class="font-medium"
+                            [class.text-emerald-300]="cat.available >= 0"
+                            [class.text-red-300]="cat.available < 0">
+                            {{ formatCurrency(cat.available) }}
+                          </span> disponible
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <!-- Dropdown menú ⋮ -->
+                @if (openMenuCategoryId() === cat.id) {
+                  <div class="absolute right-4 top-10 z-20 bg-[#1A3A6E] border border-white/20 rounded-xl shadow-xl overflow-hidden min-w-[130px]">
+                    <button
+                      (click)="openEditCategory(cat); closeMenu()"
+                      class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                      Editar
+                    </button>
+                    <button
+                      (click)="confirmDeleteCategory(cat.id); closeMenu()"
+                      class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-300 hover:bg-red-400/15 transition-colors border-t border-white/10"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                      Eliminar
+                    </button>
+                  </div>
+                }
               </div>
             }
+
+            <!-- Acordeón: categorías completadas -->
+            @if (completedCategories.length > 0) {
+              <button
+                (click)="showCompletadas.update(v => !v)"
+                class="w-full flex items-center justify-between px-4 py-3 border-t border-white/10 text-white/40 hover:text-white/60 hover:bg-white/5 transition-colors"
+              >
+                <div class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span class="text-xs font-medium">Completadas ({{ completedCategories.length }})</span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200"
+                  [class.rotate-180]="showCompletadas()"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+
+              @if (showCompletadas()) {
+                @for (cat of completedCategories; track cat.id) {
+                  <div class="relative border-t border-white/5 opacity-40 hover:opacity-60 transition-opacity">
+                    <!-- Área clickeable → abre modal de movimiento -->
+                    <div
+                      (click)="openTxForm(cat.id)"
+                      class="px-4 py-4 cursor-pointer"
+                    >
+                      <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 text-lg grayscale">
+                          {{ getCategoryIcon(cat.name) }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-sm font-semibold text-white/70 truncate line-through">{{ cat.name }}</span>
+                            <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/40">
+                                100%
+                              </span>
+                              <!-- Botón ⋮ -->
+                              <button
+                                (click)="$event.stopPropagation(); toggleMenu(cat.id)"
+                                class="relative z-20 p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="w-full bg-white/10 rounded-full h-2 mb-2">
+                            <div class="h-2 rounded-full bg-white/20 w-full"></div>
+                          </div>
+                          <div class="flex items-center gap-3 text-xs text-white/30 flex-wrap">
+                            <span>
+                              <span class="font-medium">{{ formatCurrency(cat.spent) }}</span> gastado
+                            </span>
+                            <span class="text-white/20">·</span>
+                            <span>
+                              <span class="font-medium">{{ formatCurrency(cat.assigned) }}</span> asignado
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Dropdown menú ⋮ -->
+                    @if (openMenuCategoryId() === cat.id) {
+                      <div class="absolute right-4 top-10 z-20 bg-[#1A3A6E] border border-white/20 rounded-xl shadow-xl overflow-hidden min-w-[130px]">
+                        <button
+                          (click)="openEditCategory(cat); closeMenu()"
+                          class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                          </svg>
+                          Editar
+                        </button>
+                        <button
+                          (click)="confirmDeleteCategory(cat.id); closeMenu()"
+                          class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-300 hover:bg-red-400/15 transition-colors border-t border-white/10"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                          Eliminar
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              }
+            }
+
           </div>
         }
       </div>
@@ -543,6 +693,44 @@
               Guardando...
             } @else {
               {{ editingCategoryId() ? 'Guardar cambios' : 'Agregar' }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: confirmar eliminación de categoría ────────────────────────── -->
+@if (deleteCategoryId()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="cancelDeleteCategory()"></div>
+    <div class="relative bg-[#1A3A6E]/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+      <div class="text-center">
+        <div class="w-14 h-14 rounded-2xl bg-red-400/15 flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white text-base mb-1">¿Eliminar categoría?</h3>
+        <p class="text-sm text-white/60 mb-5">Esta acción no se puede deshacer. Los movimientos registrados en esta categoría no se eliminarán.</p>
+        <div class="flex gap-3">
+          <button (click)="cancelDeleteCategory()"
+            [disabled]="deleteLoading()"
+            class="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 disabled:opacity-50">
+            Cancelar
+          </button>
+          <button (click)="doDeleteCategory()"
+            [disabled]="deleteLoading()"
+            class="flex-1 py-2.5 bg-red-500/70 hover:bg-red-400/80 text-white rounded-xl text-sm font-bold transition-all duration-200 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+            @if (deleteLoading()) {
+              <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Eliminando...
+            } @else {
+              Eliminar
             }
           </button>
         </div>

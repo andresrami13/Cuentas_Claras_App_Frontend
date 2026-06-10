@@ -52,7 +52,7 @@ export class LoginComponent {
     try {
       await this.auth.login({ documentNumber: this.documentNumber, password: this.password });
       const role = this.auth.user()?.role?.roleCode;
-      this.router.navigate([role === 'ADM' ? '/admin/users' : '/transactions']);
+      this.router.navigate([role === 'ADM' ? '/admin/users' : '/budget']);
     } catch (err: unknown) {
       this.error.set(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
@@ -123,7 +123,7 @@ export class LoginComponent {
     this.registerLoading.set(true);
     try {
       await this.auth.register(f);
-      this.router.navigate(['/transactions']);
+      this.router.navigate(['/budget']);
     } catch (err: unknown) {
       this.registerError.set(err instanceof Error ? err.message : 'Error al registrarse');
     } finally {

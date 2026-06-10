@@ -173,6 +173,20 @@ export class BudgetService {
     this._cycle.update(c => c ? { ...c, categories: [...c.categories, newCat] } : c);
   }
 
+  async deleteCategory(categoryId: string): Promise<void> {
+    const cycleId = this._cycle()?.id;
+    if (!cycleId) return;
+    await lastValueFrom(
+      this.http.delete<ApiResponse<null>>(
+        `${API}/budget-cycles/${cycleId}/categories/${categoryId}`
+      ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
+    );
+    this._cycle.update(c => c ? {
+      ...c,
+      categories: c.categories.filter(cat => cat.id !== categoryId),
+    } : c);
+  }
+
   async updateCategory(categoryId: string, form: AddCategoryForm): Promise<void> {
     const cycleId = this._cycle()?.id;
     if (!cycleId) return;

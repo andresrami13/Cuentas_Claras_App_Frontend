@@ -144,6 +144,20 @@ export class TransactionsComponent implements OnInit {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount);
   }
 
+  formatCompact(amount: number): string {
+    const abs = Math.abs(amount);
+    const prefix = amount < 0 ? '-$' : '$';
+    if (abs >= 1_000_000) {
+      const v = (abs / 1_000_000).toFixed(1).replace(/\.0$/, '');
+      return `${prefix}${v}M`;
+    }
+    if (abs >= 1_000) {
+      const v = (abs / 1_000).toFixed(1).replace(/\.0$/, '');
+      return `${prefix}${v}K`;
+    }
+    return `${prefix}${abs.toFixed(0)}`;
+  }
+
   getFirstName(): string {
     const name = this.user()?.name ?? '';
     return name.split(' ')[0];

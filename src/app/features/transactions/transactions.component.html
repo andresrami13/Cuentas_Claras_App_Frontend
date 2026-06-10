@@ -30,7 +30,7 @@
         <span class="text-xs text-white/70 font-medium hidden sm:block">Ingresos</span>
       </div>
       <p class="text-emerald-300 font-bold text-base md:text-lg leading-tight">
-        {{ formatCurrency(totalIncome()) }}
+        {{ formatCompact(totalIncome()) }}
       </p>
       <p class="text-xs text-white/50 mt-0.5 sm:hidden">Ingresos</p>
     </div>
@@ -46,7 +46,7 @@
         <span class="text-xs text-white/70 font-medium hidden sm:block">Egresos</span>
       </div>
       <p class="text-red-300 font-bold text-base md:text-lg leading-tight">
-        {{ formatCurrency(totalExpenses()) }}
+        {{ formatCompact(totalExpenses()) }}
       </p>
       <p class="text-xs text-white/50 mt-0.5 sm:hidden">Egresos</p>
     </div>
@@ -64,7 +64,7 @@
       <p class="font-bold text-base md:text-lg leading-tight"
         [class.text-cyan-300]="balance() >= 0"
         [class.text-red-300]="balance() < 0">
-        {{ formatCurrency(balance()) }}
+        {{ formatCompact(balance()) }}
       </p>
       <p class="text-xs text-white/40 mt-0.5 sm:hidden">Balance</p>
     </div>

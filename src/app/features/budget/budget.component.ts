@@ -35,6 +35,10 @@ export class BudgetComponent implements OnInit {
   readonly totalSpent = this.budgetService.totalSpent;
   readonly totalAvailable = this.budgetService.totalAvailable;
 
+  readonly totalIncome = this.txService.totalIncome;
+  readonly totalExpenses = this.txService.totalExpenses;
+  readonly balance = this.txService.balance;
+
   readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
   readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
   readonly INCOME_TYPES = INCOME_TYPES;
@@ -68,6 +72,7 @@ export class BudgetComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.budgetService.loadConfig();
     await this.budgetService.loadActiveCycle();
+    await this.txService.loadAll();
 
     if (!this.budgetService.cycle()) {
       const config = this.budgetService.config();
@@ -120,6 +125,31 @@ export class BudgetComponent implements OnInit {
     return this.budgetService.cycle()?.categories ?? [];
   }
 
+  get activeCategories(): BudgetCategory[] {
+    return this.budgetCategories.filter(c => c.spent < c.assigned);
+  }
+
+  get completedCategories(): BudgetCategory[] {
+    return this.budgetCategories.filter(c => c.spent >= c.assigned);
+  }
+
+  showCompletadas = signal(false);
+
+  // Delete category confirmation
+  deleteCategoryId = signal<string | null>(null);
+  deleteLoading = signal(false);
+
+  // Category row menu (⋮)
+  openMenuCategoryId = signal<string | null>(null);
+
+  toggleMenu(id: string): void {
+    this.openMenuCategoryId.update(current => current === id ? null : id);
+  }
+
+  closeMenu(): void {
+    this.openMenuCategoryId.set(null);
+  }
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   getSpentPct(cat: BudgetCategory): number {
@@ -137,6 +167,20 @@ export class BudgetComponent implements OnInit {
     }).format(amount);
   }
 
+  formatCompact(amount: number): string {
+    const abs = Math.abs(amount);
+    const prefix = amount < 0 ? '-$' : '$';
+    if (abs >= 1_000_000) {
+      const v = (abs / 1_000_000).toFixed(1).replace(/\.0$/, '');
+      return `${prefix}${v}M`;
+    }
+    if (abs >= 1_000) {
+      const v = (abs / 1_000).toFixed(1).replace(/\.0$/, '');
+      return `${prefix}${v}K`;
+    }
+    return `${prefix}${abs.toFixed(0)}`;
+  }
+
   formatDate(date: string): string {
     if (!date) return '';
     const [y, m, d] = date.split('-');
@@ -145,8 +189,13 @@ export class BudgetComponent implements OnInit {
 
   // ── New transaction modal ──────────────────────────────────────────────────
 
-  openTxForm(): void {
-    this.txForm = { ...EMPTY_TX_FORM, date: new Date().toISOString().split('T')[0] };
+  openTxForm(categoryId?: string | null): void {
+    this.txForm = {
+      ...EMPTY_TX_FORM,
+      date: new Date().toISOString().split('T')[0],
+      type: categoryId ? 'expense' : 'expense',
+      budgetCategoryId: categoryId ? +categoryId : null,
+    };
     this.txFormError.set(null);
     this.showTxForm.set(true);
   }
@@ -249,6 +298,26 @@ export class BudgetComponent implements OnInit {
       this.categoryError.set(err instanceof Error ? err.message : 'Error al guardar la categoría');
     } finally {
       this.categoryLoading.set(false);
+    }
+  }
+
+  confirmDeleteCategory(id: string): void {
+    this.deleteCategoryId.set(id);
+  }
+
+  cancelDeleteCategory(): void {
+    this.deleteCategoryId.set(null);
+  }
+
+  async doDeleteCategory(): Promise<void> {
+    const id = this.deleteCategoryId();
+    if (!id) return;
+    this.deleteLoading.set(true);
+    try {
+      await this.budgetService.deleteCategory(id);
+      this.deleteCategoryId.set(null);
+    } finally {
+      this.deleteLoading.set(false);
     }
   }
 
