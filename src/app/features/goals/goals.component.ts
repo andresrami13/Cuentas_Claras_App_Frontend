@@ -36,6 +36,8 @@ export class GoalsComponent implements OnInit {
   form: GoalForm = { ...EMPTY_FORM };
   formLoading = signal(false);
   formError = signal<string | null>(null);
+  targetAmountDisplay = '';
+  currentAmountDisplay = '';
   deleteConfirmId = signal<string | null>(null);
   deleteError = signal<string | null>(null);
 
@@ -49,6 +51,8 @@ export class GoalsComponent implements OnInit {
   openCreateForm(): void {
     this.editingId.set(null);
     this.form = { ...EMPTY_FORM, startDate: new Date().toISOString().split('T')[0] };
+    this.targetAmountDisplay = '';
+    this.currentAmountDisplay = '';
     this.formError.set(null);
     this.showForm.set(true);
   }
@@ -64,6 +68,8 @@ export class GoalsComponent implements OnInit {
       targetDate: goal.deadline,
       status: goal.status,
     };
+    this.targetAmountDisplay = this.formatAmountDisplay(goal.targetAmount);
+    this.currentAmountDisplay = this.formatAmountDisplay(goal.currentAmount);
     this.formError.set(null);
     this.showForm.set(true);
   }
@@ -131,5 +137,24 @@ export class GoalsComponent implements OnInit {
 
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  private formatAmountDisplay(value: number | null): string {
+    if (!value) return '';
+    return new Intl.NumberFormat('es-CO').format(value);
+  }
+
+  onAmountInput(field: 'targetAmount' | 'currentAmount', event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '');
+    const num = digits ? parseInt(digits, 10) : null;
+    this.form[field] = num;
+    const formatted = num ? new Intl.NumberFormat('es-CO').format(num) : '';
+    if (field === 'targetAmount') {
+      this.targetAmountDisplay = formatted;
+    } else {
+      this.currentAmountDisplay = formatted;
+    }
+    input.value = formatted;
   }
 }
