@@ -34,6 +34,10 @@ export const routes: Routes = [
             path: 'config',
             loadComponent: () => import('./features/budget/budget-config/budget-config.component').then(m => m.BudgetConfigComponent),
           },
+          {
+            path: 'projection',
+            loadComponent: () => import('./features/budget/projection/projection.component').then(m => m.ProjectionComponent),
+          },
         ],
       },
       {

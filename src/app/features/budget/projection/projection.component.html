@@ -1,0 +1,403 @@
+<!-- ── Toast: proyección aplicada ─────────────────────────────────────────── -->
+@if (appliedToast()) {
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-400 text-[#1A3A6E] text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 max-w-[90vw]">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+    </svg>
+    Listo: tu próximo ciclo empezará con estas categorías
+  </div>
+}
+
+<div class="p-4 md:p-6 max-w-2xl mx-auto pb-10">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-3">
+      <button
+        (click)="goBack()"
+        title="Volver al presupuesto"
+        class="p-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl transition-all duration-200 active:scale-95"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold text-white">Proyección</h1>
+        <p class="text-sm text-white/70 mt-0.5 capitalize">{{ nextMonthName }}</p>
+      </div>
+    </div>
+    <button
+      (click)="reopenGuide()"
+      title="¿Cómo funciona?"
+      class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-cyan-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
+    >
+      ?
+    </button>
+  </div>
+
+  @if (svc.initializing()) {
+    <div class="flex flex-col items-center justify-center py-20 gap-3">
+      <svg class="animate-spin w-8 h-8 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-sm text-white/70 font-medium">Preparando tu proyección...</p>
+    </div>
+  } @else {
+
+    <!-- ── Guía para usuarios nuevos ──────────────────────────────────────── -->
+    @if (showGuide()) {
+      <div class="bg-cyan-400/10 border border-cyan-400/30 rounded-2xl p-5 mb-5">
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <h2 class="text-base font-bold text-white">🔮 ¿Qué es la proyección?</h2>
+          <button (click)="dismissGuide()" class="text-white/50 hover:text-white text-xl leading-none flex-shrink-0">&times;</button>
+        </div>
+        <p class="text-sm text-white/80 mb-4">
+          Es un <strong class="text-cyan-300">simulador de tu próximo mes</strong>: te muestra cuánta plata te quedaría libre
+          después de pagar lo que ya debes y lo que planeas gastar. Así puedes ajustar <strong class="text-cyan-300">antes</strong> de que llegue el mes.
+        </p>
+        <div class="space-y-3">
+          <div class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+            <p class="text-sm text-white/80">Escribe <strong class="text-white">cuánto dinero esperas recibir</strong> el próximo mes (sueldo, pagos extra, etc.).</p>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+            <p class="text-sm text-white/80">Anota tus <strong class="text-white">compromisos</strong>: pagos que ya sabes que debes hacer. Por ejemplo, si este mes compraste con la tarjeta de crédito, agrega aquí lo que pagarás el próximo mes.</p>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+            <p class="text-sm text-white/80">Revisa las <strong class="text-white">categorías de gasto</strong> que te sugerimos según tu historial, y ajusta los montos a tu plan.</p>
+          </div>
+          <div class="flex gap-3 items-start">
+            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">4</span>
+            <p class="text-sm text-white/80">Mira el <strong class="text-white">balance</strong>: si sale en verde, esa plata te queda libre. Si sale en rojo, estás planeando gastar más de lo que vas a recibir.</p>
+          </div>
+        </div>
+        <div class="mt-4 bg-white/10 rounded-xl px-3 py-2.5 text-xs text-white/70">
+          🛡️ Tranquilo: esto es una <strong class="text-white">simulación</strong>. Nada de lo que escribas aquí cambia tu presupuesto actual, a menos que al final decidas aplicarlo.
+        </div>
+        <button
+          (click)="dismissGuide()"
+          class="mt-4 w-full py-2.5 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] font-semibold text-sm rounded-xl transition-all duration-200 active:scale-95"
+        >
+          ¡Entendido, empecemos!
+        </button>
+      </div>
+    }
+
+    <!-- ── Paso 1: Ingresos esperados ─────────────────────────────────────── -->
+    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center">1</span>
+        <h2 class="text-base font-bold text-white">¿Cuánto esperas recibir?</h2>
+      </div>
+      <p class="text-xs text-white/60 mb-3 ml-8">
+        Suma todo lo que te va a entrar el próximo mes: sueldo, pagos extra, bonos...
+      </p>
+      <input
+        type="text"
+        appAmountInput
+        [ngModel]="svc.expectedIncome()"
+        (ngModelChange)="svc.setIncome($event)"
+        placeholder="Ej: 1'500.000"
+        class="block w-full px-4 py-3 bg-white/10 border border-white/25 rounded-xl text-lg font-semibold text-white placeholder:text-white/30 placeholder:font-normal focus:border-cyan-400/60 focus:outline-none transition-colors"
+      />
+      @if (svc.incomeThisMonth() > 0 && svc.expectedIncome() !== svc.incomeThisMonth()) {
+        <button
+          (click)="useCurrentIncome()"
+          class="mt-2.5 flex items-center gap-1.5 text-xs text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 border border-cyan-400/30 px-3 py-2 rounded-full transition-colors"
+        >
+          💡 Este mes registraste {{ formatCurrency(svc.incomeThisMonth()) }} — tocar para usar ese valor
+        </button>
+      }
+    </div>
+
+    <!-- ── Paso 2: Compromisos ────────────────────────────────────────────── -->
+    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold flex items-center justify-center">2</span>
+        <h2 class="text-base font-bold text-white">Compromisos del próximo mes</h2>
+      </div>
+      <p class="text-xs text-white/60 mb-3 ml-8">
+        Pagos que <strong class="text-white/80">ya sabes</strong> que debes hacer: la tarjeta de crédito, una cuota, un préstamo...
+      </p>
+
+      @if (svc.commitments().length === 0) {
+        <div class="bg-white/5 border border-dashed border-white/20 rounded-xl px-4 py-4 text-center mb-3">
+          <p class="text-xs text-white/60">
+            Aún no tienes compromisos.<br/>
+            <span class="text-white/40">Ejemplo: compraste $400.000 con la tarjeta este mes → agrégalo aquí para pagarlo el próximo.</span>
+          </p>
+        </div>
+      }
+
+      @for (item of svc.commitments(); track $index) {
+        <div class="flex gap-2 mb-2">
+          <input
+            type="text"
+            [ngModel]="item.name"
+            (ngModelChange)="onItemName(item, $event)"
+            placeholder="Ej: Pago tarjeta de crédito"
+            class="flex-1 min-w-0 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none transition-colors"
+          />
+          <input
+            type="text"
+            appAmountInput
+            [ngModel]="item.amount"
+            (ngModelChange)="onItemAmount(item, $event)"
+            placeholder="Monto"
+            class="w-28 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-right text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none transition-colors"
+          />
+          <button
+            (click)="svc.removeItem(item)"
+            title="Quitar"
+            class="p-2 text-white/40 hover:text-red-300 transition-colors flex-shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      }
+
+      <button
+        (click)="svc.addItem('commitment')"
+        class="w-full mt-1 py-2.5 border border-dashed border-amber-400/40 text-amber-300 text-sm font-medium rounded-xl hover:bg-amber-400/10 transition-colors"
+      >
+        + Agregar compromiso
+      </button>
+
+      @if (svc.totalCommitments() > 0) {
+        <p class="text-xs text-white/60 mt-3 text-right">
+          Total compromisos: <span class="font-semibold text-amber-300">{{ formatCurrency(svc.totalCommitments()) }}</span>
+        </p>
+      }
+    </div>
+
+    <!-- ── Paso 3: Categorías de gasto ────────────────────────────────────── -->
+    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center">3</span>
+        <h2 class="text-base font-bold text-white">¿En qué planeas gastar?</h2>
+      </div>
+      <p class="text-xs text-white/60 mb-3 ml-8">
+        Te sugerimos montos según tu plantilla y lo que has gastado antes. Puedes cambiarlos: la etiqueta te dice de dónde salió cada valor.
+      </p>
+
+      @if (svc.expenses().length === 0) {
+        <div class="bg-white/5 border border-dashed border-white/20 rounded-xl px-4 py-4 text-center mb-3">
+          <p class="text-xs text-white/60">
+            No hay categorías todavía.<br/>
+            <span class="text-white/40">Agrega en qué sueles gastar: mercado, transporte, arriendo...</span>
+          </p>
+        </div>
+      }
+
+      @for (item of svc.expenses(); track $index) {
+        <div class="mb-2">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [ngModel]="item.name"
+              (ngModelChange)="onItemName(item, $event)"
+              placeholder="Ej: Mercado"
+              class="flex-1 min-w-0 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white placeholder:text-white/30 focus:border-cyan-400/60 focus:outline-none transition-colors"
+            />
+            <input
+              type="text"
+              appAmountInput
+              [ngModel]="item.amount"
+              (ngModelChange)="onItemAmount(item, $event)"
+              placeholder="Monto"
+              class="w-28 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-right text-white placeholder:text-white/30 focus:border-cyan-400/60 focus:outline-none transition-colors"
+            />
+            <button
+              (click)="svc.removeItem(item)"
+              title="Quitar"
+              class="p-2 text-white/40 hover:text-red-300 transition-colors flex-shrink-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+          @if (item.source !== 'manual') {
+            <span
+              class="inline-block mt-1 ml-1 text-[10px] px-2 py-0.5 rounded-full"
+              [class]="item.source === 'history' ? 'bg-violet-400/15 text-violet-300' : 'bg-cyan-400/10 text-cyan-300/80'"
+              [title]="item.source === 'history' ? 'Promedio de lo que gastaste en los últimos meses' : 'Viene de tu configuración de categorías fijas'"
+            >
+              {{ item.source === 'history' ? '📊 Sugerido por tu historial' : '📋 De tu plantilla' }}
+            </span>
+          }
+        </div>
+      }
+
+      <button
+        (click)="svc.addItem('expense')"
+        class="w-full mt-1 py-2.5 border border-dashed border-cyan-400/40 text-cyan-300 text-sm font-medium rounded-xl hover:bg-cyan-400/10 transition-colors"
+      >
+        + Agregar categoría
+      </button>
+
+      @if (svc.totalExpenses() > 0) {
+        <p class="text-xs text-white/60 mt-3 text-right">
+          Total gastos proyectados: <span class="font-semibold text-cyan-300">{{ formatCurrency(svc.totalExpenses()) }}</span>
+        </p>
+      }
+    </div>
+
+    <!-- ── Resumen: balance proyectado ────────────────────────────────────── -->
+    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
+      <h2 class="text-base font-bold text-white mb-1 capitalize">Así se ve tu {{ nextMonthName }}</h2>
+      <p class="text-xs text-white/60 mb-4">Este es el resultado de tu simulación:</p>
+
+      <div class="space-y-2.5 text-sm">
+        <div class="flex justify-between items-center">
+          <span class="text-white/70">Ingresos esperados</span>
+          <span class="font-semibold text-emerald-300">+{{ formatCurrency(svc.expectedIncome() ?? 0) }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-white/70">Compromisos (deudas, cuotas)</span>
+          <span class="font-semibold text-amber-300">−{{ formatCurrency(svc.totalCommitments()) }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-white/70">Gastos proyectados</span>
+          <span class="font-semibold text-cyan-300">−{{ formatCurrency(svc.totalExpenses()) }}</span>
+        </div>
+      </div>
+
+      <div class="border-t border-white/15 my-4"></div>
+
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-sm font-semibold text-white">Te quedaría libre</span>
+        <span
+          class="text-2xl font-bold"
+          [class]="svc.balance() >= 0 ? 'text-emerald-300' : 'text-red-300'"
+        >
+          {{ formatCurrency(svc.balance()) }}
+        </span>
+      </div>
+
+      @if ((svc.expectedIncome() ?? 0) > 0) {
+        <div class="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-1.5">
+          <div
+            class="h-full rounded-full transition-all duration-500"
+            [class]="svc.balance() >= 0 ? 'bg-gradient-to-r from-cyan-400 to-emerald-400' : 'bg-red-400'"
+            [style.width.%]="svc.committedPct()"
+          ></div>
+        </div>
+        <p class="text-[11px] text-white/50 mb-3">
+          Ya tienes comprometido el {{ svc.committedPct() | number:'1.0-0' }}% de lo que esperas recibir.
+        </p>
+      }
+
+      <!-- Interpretación en lenguaje simple -->
+      @if ((svc.expectedIncome() ?? 0) === 0 && svc.totalProjected() === 0) {
+        <div class="bg-white/5 rounded-xl px-3 py-2.5 text-xs text-white/60">
+          👆 Empieza por el paso 1: escribe cuánto esperas recibir, y aquí verás tu balance al instante.
+        </div>
+      } @else if (svc.balance() >= 0) {
+        <div class="bg-emerald-400/10 border border-emerald-400/30 rounded-xl px-3 py-2.5 text-xs text-emerald-200">
+          ✅ <strong>Vas bien:</strong> después de pagar tus compromisos y cubrir tus gastos, te quedarían
+          {{ formatCurrency(svc.balance()) }} libres. Podrías destinarlos a una meta de ahorro.
+        </div>
+      } @else {
+        <div class="bg-red-400/10 border border-red-400/30 rounded-xl px-3 py-2.5 text-xs text-red-200">
+          ⚠️ <strong>Cuidado:</strong> estás planeando gastar {{ formatCurrency(-svc.balance()) }} más de lo que esperas
+          recibir. Intenta bajar montos en alguna categoría o revisa si todos los compromisos son para ese mes.
+        </div>
+      }
+    </div>
+
+    <!-- ── Acciones ───────────────────────────────────────────────────────── -->
+    <div class="space-y-2.5">
+      <button
+        (click)="openApplyModal()"
+        [disabled]="!canApply"
+        class="w-full py-3 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] font-bold text-sm rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Usar esta proyección en mi próximo ciclo
+      </button>
+      <button
+        (click)="showResetConfirm.set(true)"
+        class="w-full py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 text-sm font-medium rounded-xl transition-all duration-200 active:scale-95"
+      >
+        Volver a las sugerencias automáticas
+      </button>
+      <p class="text-[11px] text-white/40 text-center px-4">
+        Tu simulación se guarda en este dispositivo. Tu ciclo y presupuesto actuales no cambian a menos que toques el botón azul.
+      </p>
+    </div>
+  }
+</div>
+
+<!-- ── Modal: confirmar aplicar al próximo ciclo ──────────────────────────── -->
+@if (showApplyModal()) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showApplyModal.set(false)"></div>
+    <div class="relative w-full sm:max-w-md bg-[#1A3A6E] border border-white/15 rounded-t-2xl sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto">
+      <h3 class="text-lg font-bold text-white mb-2">¿Aplicar esta proyección?</h3>
+      <p class="text-sm text-white/70 mb-4">
+        Esto actualizará tus <strong class="text-white">categorías fijas</strong>: cuando comience tu próximo ciclo,
+        se creará automáticamente con estas categorías y montos.
+      </p>
+      <ul class="text-xs text-white/60 space-y-2 mb-4 bg-white/5 rounded-xl p-3">
+        <li>✔️ Tu ciclo y gastos <strong class="text-white/80">actuales no se tocan</strong>.</li>
+        <li>✔️ Los compromisos (como el pago de la tarjeta) también se crearán como categorías, para que registres el pago cuando lo hagas.</li>
+        <li>💡 Si un compromiso era solo por una vez, podrás eliminarlo de la configuración después de pagarlo.</li>
+      </ul>
+      @if (applyError()) {
+        <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl mb-4">
+          {{ applyError() }}
+        </div>
+      }
+      <div class="flex gap-3">
+        <button
+          (click)="showApplyModal.set(false)"
+          [disabled]="applyLoading()"
+          class="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="doApply()"
+          [disabled]="applyLoading()"
+          class="flex-1 py-2.5 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] text-sm font-bold rounded-xl transition-colors disabled:opacity-60"
+        >
+          {{ applyLoading() ? 'Aplicando...' : 'Sí, aplicar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: confirmar restablecer ───────────────────────────────────────── -->
+@if (showResetConfirm()) {
+  <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showResetConfirm.set(false)"></div>
+    <div class="relative w-full sm:max-w-sm bg-[#1A3A6E] border border-white/15 rounded-t-2xl sm:rounded-2xl p-6">
+      <h3 class="text-lg font-bold text-white mb-2">¿Restablecer la simulación?</h3>
+      <p class="text-sm text-white/70 mb-5">
+        Se borrarán los montos y compromisos que escribiste, y volverás a ver las sugerencias automáticas
+        basadas en tu plantilla y tu historial.
+      </p>
+      <div class="flex gap-3">
+        <button
+          (click)="showResetConfirm.set(false)"
+          class="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium rounded-xl transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="confirmReset()"
+          class="flex-1 py-2.5 bg-red-400/80 hover:bg-red-300/90 text-[#1A3A6E] text-sm font-bold rounded-xl transition-colors"
+        >
+          Sí, restablecer
+        </button>
+      </div>
+    </div>
+  </div>
+}

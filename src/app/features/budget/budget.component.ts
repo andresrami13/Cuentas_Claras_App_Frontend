@@ -324,4 +324,8 @@ export class BudgetComponent implements OnInit {
   goToConfig(): void {
     this.router.navigate(['/budget/config']);
   }
+
+  goToProjection(): void {
+    this.router.navigate(['/budget/projection']);
+  }
 }

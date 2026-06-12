@@ -68,6 +68,7 @@
               <input
                 type="text"
                 [(ngModel)]="documentNumber"
+                (ngModelChange)="onDocumentChange()"
                 (keydown.enter)="handleLogin()"
                 [disabled]="loading()"
                 class="block w-full pl-10 pr-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-cyan-400/60 focus:outline-none transition-colors disabled:opacity-60"
@@ -109,17 +110,46 @@
             </div>
           </div>
 
-          @if (error()) {
-            <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl">
-              {{ error() }}
+          @if (isBlocked()) {
+            <div class="bg-red-500/20 border border-red-400/40 rounded-xl px-4 py-3 flex gap-3 items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <div>
+                <p class="text-red-300 text-sm font-semibold">Cuenta bloqueada temporalmente</p>
+                <p class="text-red-300/80 text-xs mt-0.5">Por favor espera 15 minutos y vuelve a intentarlo.</p>
+              </div>
             </div>
+          } @else {
+            @if (error()) {
+              <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl">
+                {{ error() }}
+              </div>
+            }
+            @if (failedAttempts() >= 3) {
+              <div class="bg-amber-500/15 border border-amber-400/30 rounded-xl px-4 py-3 flex gap-3 items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-300 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+                <div>
+                  <p class="text-amber-300 text-sm font-semibold">
+                    {{ failedAttempts() }}/5 intentos
+                    @if (failedAttempts() < 5) {
+                      — Te {{ 5 - failedAttempts() === 1 ? 'queda 1 intento' : 'quedan ' + (5 - failedAttempts()) + ' intentos' }} antes de bloquear tu cuenta
+                    } @else {
+                      — Tu cuenta será bloqueada
+                    }
+                  </p>
+                </div>
+              </div>
+            }
           }
 
           <div class="pt-1 space-y-3">
             <button
               type="button"
               (click)="handleLogin()"
-              [disabled]="loading()"
+              [disabled]="loading() || isBlocked()"
               class="w-full py-3 px-4 rounded-xl text-sm font-bold text-[#1A3A6E] bg-cyan-400/80 hover:bg-cyan-300/90 backdrop-blur-sm transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 active:scale-95"
             >
               @if (loading()) {
