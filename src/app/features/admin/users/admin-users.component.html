@@ -214,9 +214,10 @@
         <div>
           <p class="text-xs font-bold text-cyan-300 uppercase tracking-wider mb-3">Acceso y rol</p>
           <div class="space-y-3">
+            @if (!editingUser()) {
             <div>
               <label class="block text-xs font-medium text-white/80 mb-1">
-                Contraseña {{ editingUser() ? '(dejar vacío para no cambiar)' : '' }} <span class="text-red-300">{{ editingUser() ? '' : '*' }}</span>
+                Contraseña <span class="text-red-300">*</span>
               </label>
               <div class="relative">
                 <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password"
@@ -237,6 +238,7 @@
                 </button>
               </div>
             </div>
+            }
 
             <div>
               <label class="block text-xs font-medium text-white/80 mb-1">Rol <span class="text-red-300">*</span></label>

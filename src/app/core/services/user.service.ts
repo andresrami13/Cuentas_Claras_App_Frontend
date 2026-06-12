@@ -22,6 +22,18 @@ export class UserService {
     return this.http.put<ApiResponse<User>>(`${API}/users/${documentNumber}`, payload);
   }
 
+  setLock(documentNumber: string, locked: boolean) {
+    return this.http.patch<ApiResponse<User>>(`${API}/users/${documentNumber}/lock`, null, {
+      params: { locked },
+    });
+  }
+
+  setRole(documentNumber: string, roleCode: string) {
+    return this.http.patch<ApiResponse<User>>(`${API}/users/${documentNumber}/role`, null, {
+      params: { roleCode },
+    });
+  }
+
   remove(documentNumber: string) {
     return this.http.delete<ApiResponse<void>>(`${API}/users/${documentNumber}`);
   }

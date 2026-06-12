@@ -131,15 +131,28 @@ export class AdminUsersComponent implements OnInit {
         email: f.email,
         celNumber: f.celNumber,
         birthDate: f.birthDate,
-        locked: f.locked,
-        role: { roleCode: f.roleCode },
       };
-      if (f.password) payload['password'] = f.password;
 
-      if (this.editingUser()) {
-        await lastValueFrom(this.userSvc.update(this.editingUser()!.documentNumber, payload));
+      const editing = this.editingUser();
+      if (editing) {
+        // El PUT ya no acepta role/locked; van por los endpoints PATCH de admin
+        await lastValueFrom(this.userSvc.update(editing.documentNumber, payload));
+        if (f.roleCode !== (editing.role?.roleCode ?? 'USR')) {
+          await lastValueFrom(this.userSvc.setRole(editing.documentNumber, f.roleCode));
+        }
+        if (f.locked !== (editing.locked ?? false)) {
+          await lastValueFrom(this.userSvc.setLock(editing.documentNumber, f.locked));
+        }
       } else {
+        // El registro siempre crea con rol básico; rol/bloqueo se ajustan después
+        payload['password'] = f.password;
         await lastValueFrom(this.userSvc.create(payload));
+        if (f.roleCode && f.roleCode !== 'USR') {
+          await lastValueFrom(this.userSvc.setRole(f.documentNumber, f.roleCode));
+        }
+        if (f.locked) {
+          await lastValueFrom(this.userSvc.setLock(f.documentNumber, true));
+        }
       }
       this.closeModal();
       await this.loadData();

@@ -36,4 +36,10 @@ export interface ApiResponse<T> {
 export interface LoginResponse {
   match: boolean;
   detail: string;
+  token?: string;
+  tokenType?: string;
+  expiresIn?: number;
+  documentNumber?: string;
+  name?: string;
+  roleCode?: string;
 }

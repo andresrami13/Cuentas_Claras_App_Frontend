@@ -8,6 +8,10 @@ import { environment } from '../../../environments/environment';
 
 const API = environment.apiUrl;
 
+const USER_KEY = 'spendcount_user';
+const TOKEN_KEY = 'spendcount_token';
+const TOKEN_EXPIRY_KEY = 'spendcount_token_expiry';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -16,12 +20,32 @@ export class AuthService {
   readonly user = this._user.asReadonly();
   readonly isLoggedIn = computed(() => this._user() !== null);
 
+  get token(): string | null {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+    const expiry = Number(localStorage.getItem(TOKEN_EXPIRY_KEY));
+    if (expiry && Date.now() >= expiry) return null;
+    return token;
+  }
+
   private loadFromStorage(): User | null {
     try {
-      const stored = localStorage.getItem('spendcount_user');
+      if (!this.token) {
+        localStorage.removeItem(USER_KEY);
+        return null;
+      }
+      const stored = localStorage.getItem(USER_KEY);
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
+    }
+  }
+
+  private storeToken(login: LoginResponse): void {
+    if (!login.token) return;
+    localStorage.setItem(TOKEN_KEY, login.token);
+    if (login.expiresIn) {
+      localStorage.setItem(TOKEN_EXPIRY_KEY, String(Date.now() + login.expiresIn * 1000));
     }
   }
 
@@ -38,10 +62,11 @@ export class AuthService {
       .pipe(
         switchMap(res => {
           if (!res.data.match) throw new Error(res.data.detail);
+          this.storeToken(res.data);
           return this.http.get<ApiResponse<User>>(`${API}/users/${credentials.documentNumber}`);
         }),
         tap(res => {
-          localStorage.setItem('spendcount_user', JSON.stringify(res.data));
+          localStorage.setItem(USER_KEY, JSON.stringify(res.data));
           this._user.set(res.data);
         }),
         map(() => void 0 as void),
@@ -60,14 +85,23 @@ export class AuthService {
       celNumber: form.celNumber,
       birthDate: form.birthDate,
       password: form.password,
-      locked: false,
-      role: { roleCode: 'USR' },
     };
     const register$ = this.http
       .post<ApiResponse<User>>(`${API}/users`, body)
       .pipe(
+        switchMap(() =>
+          this.http.post<ApiResponse<LoginResponse>>(`${API}/users/login`, {
+            documentNumber: form.documentNumber,
+            password: form.password,
+          }),
+        ),
         tap(res => {
-          localStorage.setItem('spendcount_user', JSON.stringify(res.data));
+          if (!res.data.match) throw new Error(res.data.detail);
+          this.storeToken(res.data);
+        }),
+        switchMap(() => this.http.get<ApiResponse<User>>(`${API}/users/${form.documentNumber}`)),
+        tap(res => {
+          localStorage.setItem(USER_KEY, JSON.stringify(res.data));
           this._user.set(res.data);
         }),
         map(() => void 0 as void),
@@ -77,7 +111,9 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('spendcount_user');
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_EXPIRY_KEY);
     this._user.set(null);
   }
 }
