@@ -17,12 +17,14 @@ export interface FabAction {
     @if (open()) {
       <div class="md:hidden fixed inset-0 z-20 bg-black/20" (click)="open.set(false)"></div>
     }
-    <div class="md:hidden fixed bottom-20 right-4 z-30 flex flex-col items-end gap-3">
+    <!-- pointer-events-none: el contenedor no debe capturar toques sobre
+         las opciones invisibles; solo el + y las opciones abiertas son táctiles -->
+    <div class="md:hidden fixed bottom-20 right-4 z-30 flex flex-col items-end gap-3 pointer-events-none">
       @for (a of actions(); track a.id; let i = $index) {
         <div
           class="flex items-center gap-2.5 transition-all duration-200 ease-out"
           [class]="open()
-            ? 'opacity-100 translate-y-0 scale-100'
+            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
             : 'opacity-0 translate-y-3 scale-75 pointer-events-none'"
           [style.transitionDelay.ms]="open() ? (actions().length - 1 - i) * 50 : 0"
         >
@@ -42,7 +44,7 @@ export interface FabAction {
         type="button"
         (click)="open.update(v => !v)"
         title="Acciones"
-        class="w-14 h-14 rounded-full bg-accent-400 text-on-accent shadow-lg shadow-accent-500/30 flex items-center justify-center hover:bg-accent-300 transition-all duration-200 active:scale-95"
+        class="pointer-events-auto w-14 h-14 rounded-full bg-accent-400 text-on-accent shadow-lg shadow-accent-500/30 flex items-center justify-center hover:bg-accent-300 transition-all duration-200 active:scale-95"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
