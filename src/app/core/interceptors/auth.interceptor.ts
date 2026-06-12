@@ -29,6 +29,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigate(['/login']);
         return throwError(() => new Error('Tu sesión ha expirado. Inicia sesión de nuevo.'));
       }
+      // 429: demasiadas peticiones — solo asegurar un mensaje amigable, sin cerrar sesión
+      if (err.status === 429 && !err.error?.message) {
+        return throwError(() => new HttpErrorResponse({
+          error: { code: 429, message: 'Demasiadas peticiones. Espera un momento antes de volver a intentar.', data: null },
+          status: 429,
+          statusText: err.statusText,
+          url: err.url ?? undefined,
+        }));
+      }
       return throwError(() => err);
     }),
   );

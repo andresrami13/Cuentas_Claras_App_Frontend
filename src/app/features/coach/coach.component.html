@@ -163,6 +163,7 @@
                 [(ngModel)]="question"
                 (keydown.enter)="send()"
                 [disabled]="isLoading()"
+                maxlength="1000"
                 placeholder="Escribe tu pregunta sobre esta meta..."
                 class="flex-1 text-sm bg-white/10 border border-white/25 rounded-xl px-3 py-2.5 text-white placeholder:text-white/40 focus:border-cyan-400/60 focus:outline-none transition-colors disabled:opacity-50"
               />
@@ -183,6 +184,12 @@
                 }
               </button>
             </div>
+
+            @if (question.length > 900) {
+              <p class="text-xs text-right" [class]="question.length >= 1000 ? 'text-red-300' : 'text-white/50'">
+                {{ question.length }}/1000 caracteres
+              </p>
+            }
           </div>
         </div>
 
