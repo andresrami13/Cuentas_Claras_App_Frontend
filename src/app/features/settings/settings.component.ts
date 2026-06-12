@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Location } from '@angular/common';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
@@ -7,4 +8,9 @@ import { ThemeService } from '../../core/services/theme.service';
 })
 export class SettingsComponent {
   protected readonly themeSvc = inject(ThemeService);
+  private readonly location = inject(Location);
+
+  close(): void {
+    this.location.back();
+  }
 }
