@@ -1,9 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { GoalService, GoalForm } from '../../core/services/goal.service';
 import { FinancialGoal } from '../../core/models/goal.model';
 import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
+import { FabMenuComponent, FabAction } from '../../shared/components/fab-menu/fab-menu.component';
 
 const EMPTY_FORM: GoalForm = {
   name: '',
@@ -23,11 +24,12 @@ const STATUS_LABELS: Record<string, string> = {
 
 @Component({
   selector: 'app-goals',
-  imports: [FormsModule, RouterLink, FeatureGuideComponent],
+  imports: [FormsModule, RouterLink, FeatureGuideComponent, FabMenuComponent],
   templateUrl: './goals.component.html',
 })
 export class GoalsComponent implements OnInit {
   private readonly goalService = inject(GoalService);
+  private readonly router = inject(Router);
 
   readonly goals = this.goalService.goals;
   readonly loading = this.goalService.loading;
@@ -51,6 +53,16 @@ export class GoalsComponent implements OnInit {
 
   readonly STATUS_LABELS = STATUS_LABELS;
   readonly statuses = ['ACTIVE', 'COMPLETED', 'CANCELLED'];
+
+  readonly fabActions: FabAction[] = [
+    { id: 'coach', label: 'Preguntar al coach', emoji: '💬' },
+    { id: 'goal', label: 'Nueva meta', emoji: '🎯' },
+  ];
+
+  onFabAction(id: string): void {
+    if (id === 'goal') this.openCreateForm();
+    else if (id === 'coach') this.router.navigate(['/coach']);
+  }
 
   async ngOnInit(): Promise<void> {
     await this.goalService.loadAll();

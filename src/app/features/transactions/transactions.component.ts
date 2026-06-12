@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
+import { FabMenuComponent, FabAction } from '../../shared/components/fab-menu/fab-menu.component';
 import { TransactionService } from '../../core/services/transaction.service';
 import { BudgetService } from '../../core/services/budget.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -29,7 +30,7 @@ const EMPTY_FILTER: TransactionFilter = {
 
 @Component({
   selector: 'app-transactions',
-  imports: [FormsModule, DatePipe, AmountInputDirective, FeatureGuideComponent],
+  imports: [FormsModule, DatePipe, AmountInputDirective, FeatureGuideComponent, FabMenuComponent],
   templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {
@@ -75,9 +76,18 @@ export class TransactionsComponent implements OnInit {
     await this.txService.loadAll();
   }
 
-  openAddForm(): void {
+  readonly fabActions: FabAction[] = [
+    { id: 'income', label: 'Nuevo ingreso', emoji: '💰' },
+    { id: 'expense', label: 'Nuevo gasto', emoji: '💸' },
+  ];
+
+  onFabAction(id: string): void {
+    this.openAddForm(id === 'income' ? 'income' : 'expense');
+  }
+
+  openAddForm(type: 'expense' | 'income' = 'expense'): void {
     this.editingId.set(null);
-    this.form = { ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] };
+    this.form = { ...EMPTY_FORM, type, date: new Date().toISOString().split('T')[0] };
     this.showForm.set(true);
   }
 

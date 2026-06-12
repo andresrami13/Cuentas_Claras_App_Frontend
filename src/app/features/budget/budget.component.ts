@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
+import { FabMenuComponent, FabAction } from '../../shared/components/fab-menu/fab-menu.component';
 import { BudgetService } from '../../core/services/budget.service';
 import { TransactionService } from '../../core/services/transaction.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -21,7 +22,7 @@ const EMPTY_TX_FORM: TransactionForm = {
 
 @Component({
   selector: 'app-budget',
-  imports: [FormsModule, DecimalPipe, AmountInputDirective, FeatureGuideComponent],
+  imports: [FormsModule, DecimalPipe, AmountInputDirective, FeatureGuideComponent, FabMenuComponent],
   templateUrl: './budget.component.html',
 })
 export class BudgetComponent implements OnInit {
@@ -50,6 +51,21 @@ export class BudgetComponent implements OnInit {
   readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
   readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
   readonly INCOME_TYPES = INCOME_TYPES;
+
+  // Menú desplegable del engranaje (configuración / proyección / ayuda)
+  headerMenuOpen = signal(false);
+
+  readonly fabActions: FabAction[] = [
+    { id: 'category', label: 'Nueva categoría', emoji: '📁' },
+    { id: 'income', label: 'Nuevo ingreso', emoji: '💰' },
+    { id: 'expense', label: 'Nuevo gasto', emoji: '💸' },
+  ];
+
+  onFabAction(id: string): void {
+    if (id === 'expense') this.openTxForm(null, 'expense');
+    else if (id === 'income') this.openTxForm(null, 'income');
+    else if (id === 'category') this.openAddCategory();
+  }
 
   // Auto-creation state
   autoCreating = signal(false);
@@ -197,12 +213,12 @@ export class BudgetComponent implements OnInit {
 
   // ── New transaction modal ──────────────────────────────────────────────────
 
-  openTxForm(categoryId?: string | null): void {
+  openTxForm(categoryId?: string | null, type: 'expense' | 'income' = 'expense'): void {
     this.txForm = {
       ...EMPTY_TX_FORM,
       date: new Date().toISOString().split('T')[0],
-      type: categoryId ? 'expense' : 'expense',
-      budgetCategoryId: categoryId ? +categoryId : null,
+      type,
+      budgetCategoryId: type === 'expense' && categoryId ? +categoryId : null,
     };
     this.txFormError.set(null);
     this.showTxForm.set(true);

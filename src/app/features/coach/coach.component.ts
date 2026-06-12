@@ -1,4 +1,4 @@
-import { Component, ElementRef, effect, inject, signal, viewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, effect, inject, signal, viewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CoachService } from '../../core/services/coach.service';
@@ -17,7 +17,7 @@ const SUGGESTIONS = [
   imports: [FormsModule, RouterLink, FeatureGuideComponent],
   templateUrl: './coach.component.html',
 })
-export class CoachComponent implements OnInit {
+export class CoachComponent implements OnInit, OnDestroy {
   private readonly coachService = inject(CoachService);
   private readonly goalService = inject(GoalService);
   private readonly txService = inject(TransactionService);
@@ -45,8 +45,23 @@ export class CoachComponent implements OnInit {
 
   chatOpen = signal(false);
 
+  /** Alto visible cuando el teclado del celular está abierto (null = teclado cerrado). */
+  keyboardViewportHeight = signal<number | null>(null);
+
   private readonly chatScroll = viewChild<ElementRef<HTMLDivElement>>('chatScroll');
   private readonly chatInput = viewChild<ElementRef<HTMLInputElement>>('chatInput');
+
+  // El visualViewport refleja el área realmente visible: cuando el teclado se
+  // abre, ajustamos la altura del chat para que el input quede flotando sobre él
+  private readonly onViewportChange = (): void => {
+    if (!this.chatOpen()) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const keyboardOpen = vv.height < window.innerHeight - 50;
+    this.keyboardViewportHeight.set(keyboardOpen ? Math.round(vv.height) : null);
+    window.scrollTo(0, 0);
+    this.scrollToBottom();
+  };
 
   constructor() {
     // Auto-scroll al último mensaje cada vez que cambia la conversación
@@ -88,6 +103,8 @@ export class CoachComponent implements OnInit {
     this.coachService.selectGoal(goal);
     this.sendError = null;
     this.chatOpen.set(true);
+    window.visualViewport?.addEventListener('resize', this.onViewportChange);
+    window.visualViewport?.addEventListener('scroll', this.onViewportChange);
     setTimeout(() => {
       this.scrollToBottom();
       this.chatInput()?.nativeElement.focus();
@@ -97,6 +114,22 @@ export class CoachComponent implements OnInit {
   closeChat(): void {
     this.chatOpen.set(false);
     this.sendError = null;
+    this.keyboardViewportHeight.set(null);
+    window.visualViewport?.removeEventListener('resize', this.onViewportChange);
+    window.visualViewport?.removeEventListener('scroll', this.onViewportChange);
+  }
+
+  ngOnDestroy(): void {
+    window.visualViewport?.removeEventListener('resize', this.onViewportChange);
+    window.visualViewport?.removeEventListener('scroll', this.onViewportChange);
+  }
+
+  onInputFocus(): void {
+    // Esperar a que el teclado termine de abrir y volver al último mensaje
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      this.scrollToBottom();
+    }, 300);
   }
 
   private scrollToBottom(): void {

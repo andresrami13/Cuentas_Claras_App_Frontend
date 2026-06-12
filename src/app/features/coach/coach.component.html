@@ -131,7 +131,10 @@
 
 <!-- ════════════════════ Chat en pantalla completa ════════════════════ -->
 @if (chatOpen() && selectedGoal(); as goal) {
-  <div class="fixed inset-0 z-50 flex flex-col chat-screen-bg">
+  <div
+    class="fixed inset-x-0 top-0 z-50 flex flex-col chat-screen-bg h-screen h-dvh"
+    [style.height.px]="keyboardViewportHeight()"
+  >
 
     <!-- Header del chat -->
     <div class="flex items-center gap-3 px-4 py-3 bg-white/5 backdrop-blur-md border-b border-white/10 flex-shrink-0">
@@ -244,6 +247,7 @@
             type="text"
             [(ngModel)]="question"
             (keydown.enter)="send()"
+            (focus)="onInputFocus()"
             [disabled]="isLoading()"
             maxlength="1000"
             placeholder="Pregúntale a tu coach..."
