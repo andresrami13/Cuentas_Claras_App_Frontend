@@ -1,6 +1,6 @@
 <!-- ── Toast: proyección aplicada ─────────────────────────────────────────── -->
 @if (appliedToast()) {
-  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-400 text-[#1A3A6E] text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 max-w-[90vw]">
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-400 text-on-accent text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 max-w-[90vw]">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
     </svg>
@@ -30,7 +30,7 @@
     <button
       (click)="reopenGuide()"
       title="¿Cómo funciona?"
-      class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-cyan-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
+      class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-accent-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
     >
       ?
     </button>
@@ -38,7 +38,7 @@
 
   @if (svc.initializing()) {
     <div class="flex flex-col items-center justify-center py-20 gap-3">
-      <svg class="animate-spin w-8 h-8 text-cyan-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="animate-spin w-8 h-8 text-accent-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -48,30 +48,30 @@
 
     <!-- ── Guía para usuarios nuevos ──────────────────────────────────────── -->
     @if (showGuide()) {
-      <div class="bg-cyan-400/10 border border-cyan-400/30 rounded-2xl p-5 mb-5">
+      <div class="bg-accent-400/10 border border-accent-400/30 rounded-2xl p-5 mb-5">
         <div class="flex items-start justify-between gap-3 mb-3">
           <h2 class="text-base font-bold text-white">🔮 ¿Qué es la proyección?</h2>
           <button (click)="dismissGuide()" class="text-white/50 hover:text-white text-xl leading-none flex-shrink-0">&times;</button>
         </div>
         <p class="text-sm text-white/80 mb-4">
-          Es un <strong class="text-cyan-300">simulador de tu próximo mes</strong>: te muestra cuánta plata te quedaría libre
-          después de pagar lo que ya debes y lo que planeas gastar. Así puedes ajustar <strong class="text-cyan-300">antes</strong> de que llegue el mes.
+          Es un <strong class="text-accent-300">simulador de tu próximo mes</strong>: te muestra cuánta plata te quedaría libre
+          después de pagar lo que ya debes y lo que planeas gastar. Así puedes ajustar <strong class="text-accent-300">antes</strong> de que llegue el mes.
         </p>
         <div class="space-y-3">
           <div class="flex gap-3 items-start">
-            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+            <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
             <p class="text-sm text-white/80">Escribe <strong class="text-white">cuánto dinero esperas recibir</strong> el próximo mes (sueldo, pagos extra, etc.).</p>
           </div>
           <div class="flex gap-3 items-start">
-            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+            <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
             <p class="text-sm text-white/80">Anota tus <strong class="text-white">compromisos</strong>: pagos que ya sabes que debes hacer. Por ejemplo, si este mes compraste con la tarjeta de crédito, agrega aquí lo que pagarás el próximo mes.</p>
           </div>
           <div class="flex gap-3 items-start">
-            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+            <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
             <p class="text-sm text-white/80">Revisa las <strong class="text-white">categorías de gasto</strong> que te sugerimos según tu historial, y ajusta los montos a tu plan.</p>
           </div>
           <div class="flex gap-3 items-start">
-            <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center flex-shrink-0">4</span>
+            <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center flex-shrink-0">4</span>
             <p class="text-sm text-white/80">Mira el <strong class="text-white">balance</strong>: si sale en verde, esa plata te queda libre. Si sale en rojo, estás planeando gastar más de lo que vas a recibir.</p>
           </div>
         </div>
@@ -80,7 +80,7 @@
         </div>
         <button
           (click)="dismissGuide()"
-          class="mt-4 w-full py-2.5 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] font-semibold text-sm rounded-xl transition-all duration-200 active:scale-95"
+          class="mt-4 w-full py-2.5 bg-accent-400/80 hover:bg-accent-300/90 text-on-accent font-semibold text-sm rounded-xl transition-all duration-200 active:scale-95"
         >
           ¡Entendido, empecemos!
         </button>
@@ -90,7 +90,7 @@
     <!-- ── Paso 1: Ingresos esperados ─────────────────────────────────────── -->
     <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
       <div class="flex items-center gap-2 mb-1">
-        <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center">1</span>
+        <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center">1</span>
         <h2 class="text-base font-bold text-white">¿Cuánto esperas recibir?</h2>
       </div>
       <p class="text-xs text-white/60 mb-3 ml-8">
@@ -102,12 +102,12 @@
         [ngModel]="svc.expectedIncome()"
         (ngModelChange)="svc.setIncome($event)"
         placeholder="Ej: 1'500.000"
-        class="block w-full px-4 py-3 bg-white/10 border border-white/25 rounded-xl text-lg font-semibold text-white placeholder:text-white/30 placeholder:font-normal focus:border-cyan-400/60 focus:outline-none transition-colors"
+        class="block w-full px-4 py-3 bg-white/10 border border-white/25 rounded-xl text-lg font-semibold text-white placeholder:text-white/30 placeholder:font-normal focus:border-accent-400/60 focus:outline-none transition-colors"
       />
       @if (svc.incomeThisMonth() > 0 && svc.expectedIncome() !== svc.incomeThisMonth()) {
         <button
           (click)="useCurrentIncome()"
-          class="mt-2.5 flex items-center gap-1.5 text-xs text-cyan-300 bg-cyan-400/10 hover:bg-cyan-400/20 border border-cyan-400/30 px-3 py-2 rounded-full transition-colors"
+          class="mt-2.5 flex items-center gap-1.5 text-xs text-accent-300 bg-accent-400/10 hover:bg-accent-400/20 border border-accent-400/30 px-3 py-2 rounded-full transition-colors"
         >
           💡 Este mes registraste {{ formatCurrency(svc.incomeThisMonth()) }} — tocar para usar ese valor
         </button>
@@ -179,7 +179,7 @@
     <!-- ── Paso 3: Categorías de gasto ────────────────────────────────────── -->
     <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
       <div class="flex items-center gap-2 mb-1">
-        <span class="w-6 h-6 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold flex items-center justify-center">3</span>
+        <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center">3</span>
         <h2 class="text-base font-bold text-white">¿En qué planeas gastar?</h2>
       </div>
       <p class="text-xs text-white/60 mb-3 ml-8">
@@ -203,7 +203,7 @@
               [ngModel]="item.name"
               (ngModelChange)="onItemName(item, $event)"
               placeholder="Ej: Mercado"
-              class="flex-1 min-w-0 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white placeholder:text-white/30 focus:border-cyan-400/60 focus:outline-none transition-colors"
+              class="flex-1 min-w-0 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white placeholder:text-white/30 focus:border-accent-400/60 focus:outline-none transition-colors"
             />
             <input
               type="text"
@@ -211,7 +211,7 @@
               [ngModel]="item.amount"
               (ngModelChange)="onItemAmount(item, $event)"
               placeholder="Monto"
-              class="w-28 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-right text-white placeholder:text-white/30 focus:border-cyan-400/60 focus:outline-none transition-colors"
+              class="w-28 px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-right text-white placeholder:text-white/30 focus:border-accent-400/60 focus:outline-none transition-colors"
             />
             <button
               (click)="svc.removeItem(item)"
@@ -226,7 +226,7 @@
           @if (item.source !== 'manual') {
             <span
               class="inline-block mt-1 ml-1 text-[10px] px-2 py-0.5 rounded-full"
-              [class]="item.source === 'history' ? 'bg-violet-400/15 text-violet-300' : 'bg-cyan-400/10 text-cyan-300/80'"
+              [class]="item.source === 'history' ? 'bg-violet-400/15 text-violet-300' : 'bg-accent-400/10 text-accent-300/80'"
               [title]="item.source === 'history' ? 'Promedio de lo que gastaste en los últimos meses' : 'Viene de tu configuración de categorías fijas'"
             >
               {{ item.source === 'history' ? '📊 Sugerido por tu historial' : '📋 De tu plantilla' }}
@@ -237,14 +237,14 @@
 
       <button
         (click)="svc.addItem('expense')"
-        class="w-full mt-1 py-2.5 border border-dashed border-cyan-400/40 text-cyan-300 text-sm font-medium rounded-xl hover:bg-cyan-400/10 transition-colors"
+        class="w-full mt-1 py-2.5 border border-dashed border-accent-400/40 text-accent-300 text-sm font-medium rounded-xl hover:bg-accent-400/10 transition-colors"
       >
         + Agregar categoría
       </button>
 
       @if (svc.totalExpenses() > 0) {
         <p class="text-xs text-white/60 mt-3 text-right">
-          Total gastos proyectados: <span class="font-semibold text-cyan-300">{{ formatCurrency(svc.totalExpenses()) }}</span>
+          Total gastos proyectados: <span class="font-semibold text-accent-300">{{ formatCurrency(svc.totalExpenses()) }}</span>
         </p>
       }
     </div>
@@ -265,7 +265,7 @@
         </div>
         <div class="flex justify-between items-center">
           <span class="text-white/70">Gastos proyectados</span>
-          <span class="font-semibold text-cyan-300">−{{ formatCurrency(svc.totalExpenses()) }}</span>
+          <span class="font-semibold text-accent-300">−{{ formatCurrency(svc.totalExpenses()) }}</span>
         </div>
       </div>
 
@@ -285,7 +285,7 @@
         <div class="w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-1.5">
           <div
             class="h-full rounded-full transition-all duration-500"
-            [class]="svc.balance() >= 0 ? 'bg-gradient-to-r from-cyan-400 to-emerald-400' : 'bg-red-400'"
+            [class]="svc.balance() >= 0 ? 'bg-gradient-to-r from-accent-400 to-emerald-400' : 'bg-red-400'"
             [style.width.%]="svc.committedPct()"
           ></div>
         </div>
@@ -317,7 +317,7 @@
       <button
         (click)="openApplyModal()"
         [disabled]="!canApply"
-        class="w-full py-3 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] font-bold text-sm rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+        class="w-full py-3 bg-accent-400/80 hover:bg-accent-300/90 text-on-accent font-bold text-sm rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Usar esta proyección en mi próximo ciclo
       </button>
@@ -338,7 +338,7 @@
 @if (showApplyModal()) {
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showApplyModal.set(false)"></div>
-    <div class="relative w-full sm:max-w-md bg-[#1A3A6E] border border-white/15 rounded-t-2xl sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto">
+    <div class="relative w-full sm:max-w-md bg-surface border border-white/15 rounded-t-2xl sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto">
       <h3 class="text-lg font-bold text-white mb-2">¿Aplicar esta proyección?</h3>
       <p class="text-sm text-white/70 mb-4">
         Esto actualizará tus <strong class="text-white">categorías fijas</strong>: cuando comience tu próximo ciclo,
@@ -365,7 +365,7 @@
         <button
           (click)="doApply()"
           [disabled]="applyLoading()"
-          class="flex-1 py-2.5 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] text-sm font-bold rounded-xl transition-colors disabled:opacity-60"
+          class="flex-1 py-2.5 bg-accent-400/80 hover:bg-accent-300/90 text-on-accent text-sm font-bold rounded-xl transition-colors disabled:opacity-60"
         >
           {{ applyLoading() ? 'Aplicando...' : 'Sí, aplicar' }}
         </button>
@@ -378,7 +378,7 @@
 @if (showResetConfirm()) {
   <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showResetConfirm.set(false)"></div>
-    <div class="relative w-full sm:max-w-sm bg-[#1A3A6E] border border-white/15 rounded-t-2xl sm:rounded-2xl p-6">
+    <div class="relative w-full sm:max-w-sm bg-surface border border-white/15 rounded-t-2xl sm:rounded-2xl p-6">
       <h3 class="text-lg font-bold text-white mb-2">¿Restablecer la simulación?</h3>
       <p class="text-sm text-white/70 mb-5">
         Se borrarán los montos y compromisos que escribiste, y volverás a ver las sugerencias automáticas
@@ -393,7 +393,7 @@
         </button>
         <button
           (click)="confirmReset()"
-          class="flex-1 py-2.5 bg-red-400/80 hover:bg-red-300/90 text-[#1A3A6E] text-sm font-bold rounded-xl transition-colors"
+          class="flex-1 py-2.5 bg-red-400/80 hover:bg-red-300/90 text-on-accent text-sm font-bold rounded-xl transition-colors"
         >
           Sí, restablecer
         </button>

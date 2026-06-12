@@ -49,6 +49,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/coach/coach.component').then(m => m.CoachComponent),
       },
       {
+        path: 'settings',
+        loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
+      },
+      {
         path: 'admin',
         canActivate: [adminGuard],
         children: [

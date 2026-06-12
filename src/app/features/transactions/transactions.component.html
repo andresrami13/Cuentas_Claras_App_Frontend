@@ -6,16 +6,35 @@
       <h1 class="text-xl md:text-2xl font-bold text-white">Hola, {{ getFirstName() }} 👋</h1>
       <p class="text-sm text-white/70 mt-0.5">Resumen de tus movimientos</p>
     </div>
-    <button
-      (click)="openAddForm()"
-      class="hidden md:flex items-center gap-2 bg-cyan-400/80 hover:bg-cyan-300/90 text-[#1A3A6E] font-semibold text-sm px-4 py-2.5 rounded-xl backdrop-blur-sm transition-all duration-200 active:scale-95"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-      </svg>
-      Nuevo movimiento
-    </button>
+    <div class="flex items-center gap-2">
+      <button
+        (click)="guide.reopen()"
+        title="¿Cómo funciona?"
+        class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-accent-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
+      >
+        ?
+      </button>
+      <button
+        (click)="openAddForm()"
+        class="hidden md:flex items-center gap-2 bg-accent-400/80 hover:bg-accent-300/90 text-on-accent font-semibold text-sm px-4 py-2.5 rounded-xl backdrop-blur-sm transition-all duration-200 active:scale-95"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo movimiento
+      </button>
+    </div>
   </div>
+
+  <app-feature-guide
+    #guide
+    storageKey="transactions"
+    icon="🧾"
+    title="¿Qué son los movimientos?"
+    intro="Aquí queda el historial de toda la plata que entra (ingresos) y sale (gastos) de tu bolsillo. Es la base de todo: el presupuesto y los reportes se alimentan de lo que registres aquí."
+    [steps]="guideSteps"
+    note="💡 ¿Te equivocaste? Puedes editar o eliminar cualquier movimiento y el presupuesto se ajusta solo."
+  />
 
   <!-- Summary Cards -->
   <div class="grid grid-cols-3 gap-3 mb-6">
@@ -54,15 +73,15 @@
     <!-- Balance -->
     <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]">
       <div class="flex items-center gap-2 mb-2">
-        <div class="w-8 h-8 rounded-lg bg-cyan-400/20 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="w-8 h-8 rounded-lg bg-accent-400/20 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
           </svg>
         </div>
         <span class="text-xs text-white/60 font-medium hidden sm:block">Balance</span>
       </div>
       <p class="font-bold text-base md:text-lg leading-tight"
-        [class.text-cyan-300]="balance() >= 0"
+        [class.text-accent-300]="balance() >= 0"
         [class.text-red-300]="balance() < 0">
         {{ formatCompact(balance()) }}
       </p>
@@ -94,20 +113,20 @@
         <div>
           <label class="block text-xs font-medium text-white/60 mb-1">Tipo</label>
           <select [(ngModel)]="filter.type"
-            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-cyan-400/60 focus:outline-none">
-            <option value="all" class="bg-[#1A3A6E]">Todos</option>
-            <option value="income" class="bg-[#1A3A6E]">Ingreso</option>
-            <option value="expense" class="bg-[#1A3A6E]">Egreso</option>
+            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
+            <option value="all" class="bg-surface">Todos</option>
+            <option value="income" class="bg-surface">Ingreso</option>
+            <option value="expense" class="bg-surface">Egreso</option>
           </select>
         </div>
         @if (filter.type === 'expense') {
           <div>
             <label class="block text-xs font-medium text-white/60 mb-1">Categoría</label>
             <select [(ngModel)]="filter.budgetCategoryId"
-              class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-cyan-400/60 focus:outline-none">
-              <option [ngValue]="'all'" class="bg-[#1A3A6E]">Todas</option>
+              class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
+              <option [ngValue]="'all'" class="bg-surface">Todas</option>
               @for (cat of budgetCategories; track cat.id) {
-                <option [ngValue]="+cat.id" class="bg-[#1A3A6E]">{{ cat.name }}</option>
+                <option [ngValue]="+cat.id" class="bg-surface">{{ cat.name }}</option>
               }
             </select>
           </div>
@@ -115,15 +134,15 @@
         <div>
           <label class="block text-xs font-medium text-white/60 mb-1">Desde</label>
           <input type="date" [(ngModel)]="filter.dateFrom"
-            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-cyan-400/60 focus:outline-none">
+            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
         </div>
         <div>
           <label class="block text-xs font-medium text-white/60 mb-1">Hasta</label>
           <input type="date" [(ngModel)]="filter.dateTo"
-            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-cyan-400/60 focus:outline-none">
+            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
         </div>
         <div class="col-span-2 md:col-span-4 flex justify-end">
-          <button (click)="resetFilters()" class="text-xs text-cyan-300 font-medium hover:text-cyan-200 hover:underline">
+          <button (click)="resetFilters()" class="text-xs text-accent-300 font-medium hover:text-accent-200 hover:underline">
             Limpiar filtros
           </button>
         </div>
@@ -209,7 +228,7 @@
 <!-- Mobile FAB -->
 <button
   (click)="openAddForm()"
-  class="md:hidden fixed bottom-20 right-4 z-20 w-14 h-14 rounded-full bg-cyan-400 text-[#1A3A6E] shadow-lg shadow-cyan-500/30 flex items-center justify-center hover:bg-cyan-300 transition-all duration-200 active:scale-95"
+  class="md:hidden fixed bottom-20 right-4 z-20 w-14 h-14 rounded-full bg-accent-400 text-on-accent shadow-lg shadow-accent-500/30 flex items-center justify-center hover:bg-accent-300 transition-all duration-200 active:scale-95"
 >
   <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -220,7 +239,7 @@
 @if (showForm()) {
   <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeForm()"></div>
-    <div class="relative bg-[#1A3A6E]/80 backdrop-blur-xl border-t border-white/20 md:border md:rounded-2xl w-full md:max-w-lg rounded-t-3xl shadow-2xl z-10 max-h-[95vh] overflow-y-auto">
+    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-white/20 md:border md:rounded-2xl w-full md:max-w-lg rounded-t-3xl shadow-2xl z-10 max-h-[95vh] overflow-y-auto">
 
       <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
         <h3 class="text-base font-bold text-white">
@@ -265,7 +284,7 @@
           <div class="relative">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-white/40 text-sm font-medium">$</span>
             <input type="text" appAmountInput [(ngModel)]="form.amount"
-              class="block w-full pl-7 pr-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-cyan-400/60 focus:outline-none transition-colors"
+              class="block w-full pl-7 pr-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
               placeholder="0">
           </div>
         </div>
@@ -274,7 +293,7 @@
         <div>
           <label class="block text-sm font-medium text-white/80 mb-1.5">Fecha</label>
           <input type="date" [(ngModel)]="form.date"
-            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-cyan-400/60 focus:outline-none transition-colors">
+            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
         </div>
 
         <!-- Category (expense) -->
@@ -287,10 +306,10 @@
               </p>
             } @else {
               <select [(ngModel)]="form.budgetCategoryId"
-                class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-cyan-400/60 focus:outline-none transition-colors">
-                <option [ngValue]="null" class="bg-[#1A3A6E]">Selecciona una categoría</option>
+                class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+                <option [ngValue]="null" class="bg-surface">Selecciona una categoría</option>
                 @for (cat of budgetCategories; track cat.id) {
-                  <option [ngValue]="+cat.id" class="bg-[#1A3A6E]">{{ cat.name }}</option>
+                  <option [ngValue]="+cat.id" class="bg-surface">{{ cat.name }}</option>
                 }
               </select>
             }
@@ -302,10 +321,10 @@
           <div>
             <label class="block text-sm font-medium text-white/80 mb-1.5">Tipo de ingreso <span class="text-red-300">*</span></label>
             <select [(ngModel)]="form.incomeType"
-              class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-cyan-400/60 focus:outline-none transition-colors">
-              <option value="" class="bg-[#1A3A6E]">Selecciona un tipo</option>
+              class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+              <option value="" class="bg-surface">Selecciona un tipo</option>
               @for (t of INCOME_TYPES; track t.value) {
-                <option [value]="t.value" class="bg-[#1A3A6E]">{{ t.label }}</option>
+                <option [value]="t.value" class="bg-surface">{{ t.label }}</option>
               }
             </select>
           </div>
@@ -315,7 +334,7 @@
         <div>
           <label class="block text-sm font-medium text-white/80 mb-1.5">Descripción <span class="text-white/40">(opcional)</span></label>
           <input type="text" [(ngModel)]="form.description"
-            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-cyan-400/60 focus:outline-none transition-colors"
+            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
             placeholder="Ej. Compra supermercado">
         </div>
 
@@ -332,7 +351,7 @@
           </button>
           <button type="button" (click)="saveForm()"
             [disabled]="!form.amount || !form.date || (form.type === 'expense' && !form.budgetCategoryId) || (form.type === 'income' && !form.incomeType) || formLoading()"
-            class="flex-1 py-3 rounded-xl text-sm font-bold text-[#1A3A6E] bg-cyan-400/80 hover:bg-cyan-300/90 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-95">
+            class="flex-1 py-3 rounded-xl text-sm font-bold text-on-accent bg-accent-400/80 hover:bg-accent-300/90 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-95">
             @if (formLoading()) {
               <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -353,7 +372,7 @@
 @if (deleteConfirmId()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="cancelDelete()"></div>
-    <div class="relative bg-[#1A3A6E]/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+    <div class="relative bg-surface/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
       <div class="text-center">
         <div class="text-4xl mb-3">🗑️</div>
         <h3 class="font-bold text-white mb-1">¿Eliminar movimiento?</h3>

@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
+import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
 import { TransactionService } from '../../core/services/transaction.service';
 import { BudgetService } from '../../core/services/budget.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -28,7 +29,7 @@ const EMPTY_FILTER: TransactionFilter = {
 
 @Component({
   selector: 'app-transactions',
-  imports: [FormsModule, DatePipe, AmountInputDirective],
+  imports: [FormsModule, DatePipe, AmountInputDirective, FeatureGuideComponent],
   templateUrl: './transactions.component.html',
 })
 export class TransactionsComponent implements OnInit {
@@ -43,6 +44,13 @@ export class TransactionsComponent implements OnInit {
   readonly balance = this.txService.balance;
 
   readonly INCOME_TYPES = INCOME_TYPES;
+
+  readonly guideSteps = [
+    'Registra un ingreso cada vez que te llegue plata: tu sueldo, un pago extra, un regalo...',
+    'Registra un gasto eligiendo a qué categoría del presupuesto pertenece: así se descuenta automáticamente de ese sobre.',
+    'Usa los filtros para buscar movimientos por tipo, categoría o rango de fechas.',
+    'Las tarjetas de arriba resumen todo: el balance es ingresos menos gastos. Si está positivo, gastaste menos de lo que recibiste.',
+  ];
 
   filter: TransactionFilter = { ...EMPTY_FILTER };
   showFilters = signal(false);

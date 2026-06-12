@@ -11,6 +11,16 @@ module.exports = {
         income: '#28B463',
         expense: '#CB4335',
         background: '#F2F3F4',
+        // Colores de tema (variables CSS definidas en styles.css por cada .theme-*)
+        accent: {
+          200: 'rgb(var(--accent-200) / <alpha-value>)',
+          300: 'rgb(var(--accent-300) / <alpha-value>)',
+          400: 'rgb(var(--accent-400) / <alpha-value>)',
+          500: 'rgb(var(--accent-500) / <alpha-value>)',
+          deep: 'rgb(var(--accent-deep) / <alpha-value>)',
+        },
+        'on-accent': 'rgb(var(--on-accent) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],

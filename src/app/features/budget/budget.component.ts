@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
+import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
 import { BudgetService } from '../../core/services/budget.service';
 import { TransactionService } from '../../core/services/transaction.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -20,7 +21,7 @@ const EMPTY_TX_FORM: TransactionForm = {
 
 @Component({
   selector: 'app-budget',
-  imports: [FormsModule, DecimalPipe, AmountInputDirective],
+  imports: [FormsModule, DecimalPipe, AmountInputDirective, FeatureGuideComponent],
   templateUrl: './budget.component.html',
 })
 export class BudgetComponent implements OnInit {
@@ -38,6 +39,13 @@ export class BudgetComponent implements OnInit {
   readonly totalIncome = this.txService.totalIncome;
   readonly totalExpenses = this.txService.totalExpenses;
   readonly balance = this.txService.balance;
+
+  readonly guideSteps = [
+    'Configura tu día de pago en el botón de configuración (⚙️). Cuando llegue esa fecha, tu ciclo se crea solo con tus categorías fijas.',
+    'Crea categorías con un monto asignado: Mercado, Transporte, Arriendo... piensa en ellas como sobres donde repartes tu plata.',
+    'Registra cada gasto con "Nuevo movimiento" eligiendo su categoría: la barra te muestra cuánto llevas gastado y cuánto te queda en cada sobre.',
+    'Usa el botón 📈 para proyectar tu próximo mes: simula cuánto recibirás y gastarás antes de que llegue.',
+  ];
 
   readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
   readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];

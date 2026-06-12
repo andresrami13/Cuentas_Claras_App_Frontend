@@ -27,6 +27,7 @@ export class SidebarComponent {
       return [
         { label: 'Usuarios', route: '/admin/users', icon: 'users' },
         { label: 'Roles', route: '/admin/roles', icon: 'roles' },
+        { label: 'Ajustes', route: '/settings', icon: 'settings' },
       ];
     }
     return [
@@ -35,6 +36,7 @@ export class SidebarComponent {
       { label: 'Reportes', route: '/reports', icon: 'reports' },
       { label: 'Metas', route: '/goals', icon: 'goals' },
       { label: 'Coach IA', route: '/coach', icon: 'coach' },
+      { label: 'Ajustes', route: '/settings', icon: 'settings' },
     ];
   });
 

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { GoalService, GoalForm } from '../../core/services/goal.service';
 import { FinancialGoal } from '../../core/models/goal.model';
+import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
 
 const EMPTY_FORM: GoalForm = {
   name: '',
@@ -22,7 +23,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 @Component({
   selector: 'app-goals',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, FeatureGuideComponent],
   templateUrl: './goals.component.html',
 })
 export class GoalsComponent implements OnInit {
@@ -40,6 +41,13 @@ export class GoalsComponent implements OnInit {
   currentAmountDisplay = '';
   deleteConfirmId = signal<string | null>(null);
   deleteError = signal<string | null>(null);
+
+  readonly guideSteps = [
+    "Crea una meta con nombre, monto objetivo y fecha límite. Ej: 'Viaje a la playa, $2'000.000, para diciembre'.",
+    'Cada vez que apartes plata para tu meta, edítala y actualiza el monto actual: la barra de progreso te muestra qué tan cerca estás.',
+    'La app te dice cuántos días te quedan para la fecha límite, así sabes si vas a buen ritmo.',
+    'Pídele consejos al Coach IA sobre cualquier meta: analizará tus finanzas reales y te dirá cómo lograrla.',
+  ];
 
   readonly STATUS_LABELS = STATUS_LABELS;
   readonly statuses = ['ACTIVE', 'COMPLETED', 'CANCELLED'];

@@ -5,7 +5,7 @@
     <img src="assets/images/logo.svg" alt="Cuentas Claras" class="w-9 h-9 object-contain" />
     <div>
       <span class="text-lg font-bold text-white leading-none">Cuentas Claras</span>
-      <p class="text-xs text-cyan-300 font-medium leading-none mt-0.5">
+      <p class="text-xs text-accent-300 font-medium leading-none mt-0.5">
         {{ isAdmin() ? 'Administración' : 'Finanzas personales' }}
       </p>
     </div>
@@ -16,7 +16,7 @@
     @for (item of navItems(); track item.route) {
       <a
         [routerLink]="item.route"
-        routerLinkActive="bg-white/15 text-white border-l-4 border-cyan-400"
+        routerLinkActive="bg-white/15 text-white border-l-4 border-accent-400"
         [routerLinkActiveOptions]="{ exact: false }"
         (click)="onNavClick()"
         class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors duration-150 border-l-4 border-transparent"
@@ -51,6 +51,12 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
         }
+        @if (item.icon === 'settings') {
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        }
         @if (item.icon === 'roles') {
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -65,7 +71,7 @@
   <div class="px-4 py-4 bg-white/5 border-t border-white/10">
     @if (user(); as u) {
       <div class="flex items-center gap-3 mb-3 px-2">
-        <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-cyan-300 font-bold text-sm flex-shrink-0">
+        <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-accent-300 font-bold text-sm flex-shrink-0">
           {{ u.name.charAt(0).toUpperCase() }}
         </div>
         <div class="min-w-0">
