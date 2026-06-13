@@ -45,13 +45,17 @@ export interface LoginResponse {
 }
 
 export interface GoogleLoginResponse {
+  match: boolean;
   isNewUser: boolean;
+  detail?: string;
   token?: string;
+  tokenType?: string;
   expiresIn?: number;
   documentNumber?: string;
   email?: string;
   name?: string;
   lastName?: string;
+  roleCode?: string;
 }
 
 export interface GoogleCompleteForm {
