@@ -87,17 +87,28 @@ export class LoginComponent implements AfterViewInit {
       client_id: GOOGLE_CLIENT_ID,
       callback: (res: { credential: string }) => this.handleGoogleCredential(res),
     });
+    this.renderGoogleButton();
+    // Re-renderiza al rotar/redimensionar para mantener el ancho del contenedor
+    window.addEventListener('resize', () => this.renderGoogleButton());
+  }
+
+  private renderGoogleButton(): void {
+    const g = (window as any)['google'];
     const btn = document.getElementById('google-btn');
-    if (btn) {
-      g.accounts.id.renderButton(btn, {
-        theme: 'filled_black',
-        size: 'large',
-        width: 360,
-        text: 'continue_with',
-        locale: 'es',
-        shape: 'rectangular',
-      });
-    }
+    if (!g || !btn) return;
+    btn.innerHTML = '';
+    // GIS solo acepta ancho entero entre 200 y 400; lo ajustamos al contenedor
+    // para que en móvil no se desborde y genere scroll horizontal.
+    const width = Math.min(400, Math.max(200, Math.floor(btn.clientWidth) || 320));
+    g.accounts.id.renderButton(btn, {
+      theme: 'outline',
+      size: 'large',
+      width,
+      text: 'continue_with',
+      locale: 'es',
+      shape: 'pill',
+      logo_alignment: 'center',
+    });
   }
 
   private async handleGoogleCredential(response: { credential: string }): Promise<void> {
