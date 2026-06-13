@@ -1,8 +1,8 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { switchMap, tap, map, catchError } from 'rxjs/operators';
-import { lastValueFrom, throwError } from 'rxjs';
-import { User, LoginCredentials, RegisterForm, ApiResponse, LoginResponse } from '../models/user.model';
+import { lastValueFrom, throwError, of } from 'rxjs';
+import { User, LoginCredentials, RegisterForm, ApiResponse, LoginResponse, GoogleLoginResponse, GoogleCompleteForm } from '../models/user.model';
 
 import { environment } from '../../../environments/environment';
 
@@ -108,6 +108,44 @@ export class AuthService {
         catchError((err: HttpErrorResponse) => this.handleError(err)),
       );
     return lastValueFrom(register$);
+  }
+
+  loginWithGoogle(googleToken: string): Promise<GoogleLoginResponse> {
+    const login$ = this.http
+      .post<ApiResponse<GoogleLoginResponse>>(`${API}/users/login/google`, { googleToken })
+      .pipe(
+        switchMap(res => {
+          if (res.data.isNewUser) return of(res.data);
+          this.storeToken({ match: true, detail: '', token: res.data.token, expiresIn: res.data.expiresIn });
+          return this.http.get<ApiResponse<User>>(`${API}/users/${res.data.documentNumber}`).pipe(
+            tap(userRes => {
+              localStorage.setItem(USER_KEY, JSON.stringify(userRes.data));
+              this._user.set(userRes.data);
+            }),
+            map(() => res.data),
+          );
+        }),
+        catchError((err: HttpErrorResponse) => this.handleError(err)),
+      );
+    return lastValueFrom(login$);
+  }
+
+  registerWithGoogle(form: GoogleCompleteForm): Promise<void> {
+    const reg$ = this.http
+      .post<ApiResponse<GoogleLoginResponse>>(`${API}/users/google`, form)
+      .pipe(
+        switchMap(res => {
+          this.storeToken({ match: true, detail: '', token: res.data.token, expiresIn: res.data.expiresIn });
+          return this.http.get<ApiResponse<User>>(`${API}/users/${res.data.documentNumber!}`);
+        }),
+        tap(res => {
+          localStorage.setItem(USER_KEY, JSON.stringify(res.data));
+          this._user.set(res.data);
+        }),
+        map(() => void 0 as void),
+        catchError((err: HttpErrorResponse) => this.handleError(err)),
+      );
+    return lastValueFrom(reg$);
   }
 
   logout(): void {

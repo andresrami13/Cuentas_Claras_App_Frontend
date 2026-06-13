@@ -1,8 +1,19 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterForm } from '../../../core/models/user.model';
+
+declare const google: {
+  accounts: {
+    id: {
+      initialize(config: object): void;
+      renderButton(parent: HTMLElement, options: object): void;
+    };
+  };
+};
+
+const GOOGLE_CLIENT_ID = '674298948659-vjnsnaoc7frktpipeel4kbbsfomobqlp.apps.googleusercontent.com';
 
 const EMPTY_FORM = (): RegisterForm => ({
   documentType: 'CC',
@@ -16,12 +27,19 @@ const EMPTY_FORM = (): RegisterForm => ({
   confirmPassword: '',
 });
 
+const EMPTY_GOOGLE_COMPLETE = () => ({
+  documentType: 'CC',
+  documentNumber: '',
+  celNumber: '',
+  birthDate: '',
+});
+
 @Component({
   selector: 'app-login',
   imports: [FormsModule],
   templateUrl: './login.component.html',
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
   private auth = inject(AuthService);
   private router = inject(Router);
 
@@ -42,8 +60,102 @@ export class LoginComponent {
   showRegisterPassword = signal(false);
   showRegisterConfirm = signal(false);
 
+  googleLoading = signal(false);
+  googleError = signal<string | null>(null);
+  showGoogleComplete = signal(false);
+  googleCompleteForm = EMPTY_GOOGLE_COMPLETE();
+  googleCompleteLoading = signal(false);
+  googleCompleteError = signal<string | null>(null);
+  googleProfile = signal<{ name: string; lastName: string; email: string } | null>(null);
+  private pendingGoogleToken = '';
+  private googleInitAttempts = 0;
+
   readonly documentTypes = ['CC', 'TI', 'CE', 'PA', 'NIT'];
   readonly today = new Date().toISOString().split('T')[0];
+
+  ngAfterViewInit(): void {
+    this.initGoogle();
+  }
+
+  private initGoogle(): void {
+    if (typeof (window as any)['google'] === 'undefined') {
+      if (this.googleInitAttempts++ < 30) setTimeout(() => this.initGoogle(), 200);
+      return;
+    }
+    const g = (window as any)['google'];
+    g.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: (res: { credential: string }) => this.handleGoogleCredential(res),
+    });
+    const btn = document.getElementById('google-btn');
+    if (btn) {
+      g.accounts.id.renderButton(btn, {
+        theme: 'filled_black',
+        size: 'large',
+        width: 360,
+        text: 'continue_with',
+        locale: 'es',
+        shape: 'rectangular',
+      });
+    }
+  }
+
+  private async handleGoogleCredential(response: { credential: string }): Promise<void> {
+    this.googleLoading.set(true);
+    this.googleError.set(null);
+    try {
+      const result = await this.auth.loginWithGoogle(response.credential);
+      if (result.isNewUser) {
+        this.pendingGoogleToken = response.credential;
+        this.googleProfile.set({ name: result.name!, lastName: result.lastName!, email: result.email! });
+        this.googleCompleteForm = EMPTY_GOOGLE_COMPLETE();
+        this.showGoogleComplete.set(true);
+      } else {
+        const role = this.auth.user()?.role?.roleCode;
+        this.router.navigate([role === 'ADM' ? '/admin/users' : '/budget']);
+      }
+    } catch (err: unknown) {
+      this.googleError.set(err instanceof Error ? err.message : 'Error al iniciar sesión con Google');
+    } finally {
+      this.googleLoading.set(false);
+    }
+  }
+
+  async handleGoogleComplete(): Promise<void> {
+    const f = this.googleCompleteForm;
+    if (!f.documentType || !f.documentNumber || !f.celNumber || !f.birthDate) {
+      this.googleCompleteError.set('Por favor completa todos los campos');
+      return;
+    }
+    if (!/^\d+$/.test(f.documentNumber)) {
+      this.googleCompleteError.set('El número de documento solo debe contener números');
+      return;
+    }
+    if (!/^\d+$/.test(f.celNumber)) {
+      this.googleCompleteError.set('El número de celular solo debe contener números');
+      return;
+    }
+    if (f.birthDate > this.today) {
+      this.googleCompleteError.set('La fecha de nacimiento no puede ser posterior a hoy');
+      return;
+    }
+    this.googleCompleteError.set(null);
+    this.googleCompleteLoading.set(true);
+    try {
+      await this.auth.registerWithGoogle({
+        googleToken: this.pendingGoogleToken,
+        documentType: f.documentType,
+        documentNumber: f.documentNumber,
+        celNumber: f.celNumber,
+        birthDate: f.birthDate,
+      });
+      this.router.navigate(['/budget']);
+    } catch (err: unknown) {
+      this.googleCompleteError.set(err instanceof Error ? err.message : 'Error al completar el registro');
+    } finally {
+      this.googleCompleteLoading.set(false);
+    }
+  }
 
   onDocumentChange(): void {
     if (this.documentNumber !== this.lastAttemptedDoc) {

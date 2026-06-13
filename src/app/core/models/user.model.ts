@@ -43,3 +43,21 @@ export interface LoginResponse {
   name?: string;
   roleCode?: string;
 }
+
+export interface GoogleLoginResponse {
+  isNewUser: boolean;
+  token?: string;
+  expiresIn?: number;
+  documentNumber?: string;
+  email?: string;
+  name?: string;
+  lastName?: string;
+}
+
+export interface GoogleCompleteForm {
+  googleToken: string;
+  documentType: string;
+  documentNumber: string;
+  celNumber: string;
+  birthDate: string;
+}
