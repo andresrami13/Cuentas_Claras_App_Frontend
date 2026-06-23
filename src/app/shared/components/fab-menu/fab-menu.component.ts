@@ -28,13 +28,13 @@ export interface FabAction {
             : 'opacity-0 translate-y-3 scale-75 pointer-events-none'"
           [style.transitionDelay.ms]="open() ? (actions().length - 1 - i) * 50 : 0"
         >
-          <span class="bg-surface/95 text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/15 shadow-lg whitespace-nowrap">
+          <span class="bg-surface/95 text-ink text-xs font-semibold px-3 py-1.5 rounded-full border border-veil/15 shadow-lg whitespace-nowrap">
             {{ a.label }}
           </span>
           <button
             type="button"
             (click)="pick(a.id)"
-            class="w-11 h-11 rounded-full bg-white/15 backdrop-blur-xl border border-white/25 shadow-lg flex items-center justify-center text-xl active:scale-90 transition-transform"
+            class="w-11 h-11 rounded-full bg-veil/15 backdrop-blur-xl border border-veil/25 shadow-lg flex items-center justify-center text-xl active:scale-90 transition-transform"
           >
             {{ a.emoji }}
           </button>

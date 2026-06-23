@@ -11,20 +11,20 @@ import { Component, OnInit, input, signal } from '@angular/core';
     @if (visible()) {
       <div class="bg-accent-400/10 border border-accent-400/30 rounded-2xl p-5 mb-5">
         <div class="flex items-start justify-between gap-3 mb-3">
-          <h2 class="text-base font-bold text-white">{{ icon() }} {{ title() }}</h2>
-          <button (click)="dismiss()" class="text-white/50 hover:text-white text-xl leading-none flex-shrink-0">&times;</button>
+          <h2 class="text-base font-bold text-ink">{{ icon() }} {{ title() }}</h2>
+          <button (click)="dismiss()" class="text-ink/50 hover:text-ink text-xl leading-none flex-shrink-0">&times;</button>
         </div>
-        <p class="text-sm text-white/80 mb-4">{{ intro() }}</p>
+        <p class="text-sm text-ink/80 mb-4">{{ intro() }}</p>
         <div class="space-y-3">
           @for (step of steps(); track $index) {
             <div class="flex gap-3 items-start">
               <span class="w-6 h-6 rounded-full bg-accent-400/20 text-accent-300 text-xs font-bold flex items-center justify-center flex-shrink-0">{{ $index + 1 }}</span>
-              <p class="text-sm text-white/80">{{ step }}</p>
+              <p class="text-sm text-ink/80">{{ step }}</p>
             </div>
           }
         </div>
         @if (note()) {
-          <div class="mt-4 bg-white/10 rounded-xl px-3 py-2.5 text-xs text-white/70">{{ note() }}</div>
+          <div class="mt-4 bg-veil/10 rounded-xl px-3 py-2.5 text-xs text-ink/70">{{ note() }}</div>
         }
         <button
           (click)="dismiss()"

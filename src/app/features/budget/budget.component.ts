@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
 import { FabMenuComponent, FabAction } from '../../shared/components/fab-menu/fab-menu.component';
@@ -22,7 +22,7 @@ const EMPTY_TX_FORM: TransactionForm = {
 
 @Component({
   selector: 'app-budget',
-  imports: [FormsModule, DecimalPipe, AmountInputDirective, FeatureGuideComponent, FabMenuComponent],
+  imports: [FormsModule, DecimalPipe, NgTemplateOutlet, AmountInputDirective, FeatureGuideComponent, FabMenuComponent],
   templateUrl: './budget.component.html',
 })
 export class BudgetComponent implements OnInit {
@@ -40,6 +40,29 @@ export class BudgetComponent implements OnInit {
   readonly totalIncome = this.txService.totalIncome;
   readonly totalExpenses = this.txService.totalExpenses;
   readonly balance = this.txService.balance;
+
+  // Sobrante = plata real (balance) menos lo que sigue reservado en categorías
+  readonly sobrante = computed(() => this.balance() - this.totalAvailable());
+
+  // ── Tarjeta-flip de resumen (solo móvil) ───────────────────────────────────
+  // Cicla Balance (0) → Cat. Disponible (1) → Sobrante (2) con un giro 3D de 180°.
+  // Se usan dos caras (front/back); cada toque suma 180° y precarga la cara que
+  // viene, de modo que el contenido siempre cae derecho (sin texto espejado).
+  readonly summaryStep = signal(0);
+  readonly summaryRotation = computed(() => this.summaryStep() * 180);
+  readonly summaryIndex = computed(() => this.summaryStep() % 3);
+  readonly summaryFaceA = computed(() => {
+    const s = this.summaryStep();
+    return (s % 2 === 0 ? s : s + 1) % 3;
+  });
+  readonly summaryFaceB = computed(() => {
+    const s = this.summaryStep();
+    return (s % 2 === 1 ? s : s + 1) % 3;
+  });
+
+  cycleSummary(): void {
+    this.summaryStep.update(s => s + 1);
+  }
 
   readonly guideSteps = [
     'Configura tu día de pago en el botón de configuración (⚙️). Cuando llegue esa fecha, tu ciclo se crea solo con tus categorías fijas.',
@@ -90,6 +113,13 @@ export class BudgetComponent implements OnInit {
   txForm: TransactionForm = { ...EMPTY_TX_FORM };
   txFormLoading = signal(false);
   txFormError = signal<string | null>(null);
+  payFullRemaining = false; // "Pagar todo el disponible de la categoría"
+
+  get selectedTxCategory(): BudgetCategory | null {
+    const id = this.txForm.budgetCategoryId;
+    if (id == null) return null;
+    return this.budgetCategories.find(c => +c.id === id) ?? null;
+  }
 
   readonly isLoadingAny = computed(() => this.loading() || this.autoCreating());
 
@@ -195,12 +225,10 @@ export class BudgetComponent implements OnInit {
     const abs = Math.abs(amount);
     const prefix = amount < 0 ? '-$' : '$';
     if (abs >= 1_000_000) {
-      const v = (abs / 1_000_000).toFixed(1).replace(/\.0$/, '');
-      return `${prefix}${v}M`;
+      return `${prefix}${(abs / 1_000_000).toFixed(2)}M`;
     }
     if (abs >= 1_000) {
-      const v = (abs / 1_000).toFixed(1).replace(/\.0$/, '');
-      return `${prefix}${v}K`;
+      return `${prefix}${(abs / 1_000).toFixed(2)}K`;
     }
     return `${prefix}${abs.toFixed(0)}`;
   }
@@ -220,6 +248,7 @@ export class BudgetComponent implements OnInit {
       type,
       budgetCategoryId: type === 'expense' && categoryId ? +categoryId : null,
     };
+    this.payFullRemaining = false;
     this.txFormError.set(null);
     this.showTxForm.set(true);
   }
@@ -232,11 +261,33 @@ export class BudgetComponent implements OnInit {
   onTxTypeChange(): void {
     this.txForm.budgetCategoryId = null;
     this.txForm.incomeType = '';
+    this.payFullRemaining = false;
+  }
+
+  // Recalcula el monto si "pagar todo" sigue activo al cambiar de categoría
+  onTxCategoryChange(): void {
+    const cat = this.selectedTxCategory;
+    if (this.payFullRemaining && (!cat || cat.available <= 0)) {
+      this.payFullRemaining = false;
+    } else if (this.payFullRemaining) {
+      this.applyPayFull();
+    }
+  }
+
+  onPayFullToggle(): void {
+    if (this.payFullRemaining) this.applyPayFull();
+  }
+
+  private applyPayFull(): void {
+    const cat = this.selectedTxCategory;
+    this.txForm.amount = cat ? Math.max(0, cat.available) : null;
   }
 
   async saveTxForm(): Promise<void> {
     const isExpense = this.txForm.type === 'expense';
-    if (!this.txForm.amount || !this.txForm.date) return;
+    // La fecha siempre es la actual: el modal ya no la pide.
+    this.txForm.date = new Date().toISOString().split('T')[0];
+    if (!this.txForm.amount) return;
     if (isExpense && !this.txForm.budgetCategoryId) return;
     if (!isExpense && !this.txForm.incomeType) return;
 

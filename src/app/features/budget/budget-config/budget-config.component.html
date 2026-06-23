@@ -4,60 +4,60 @@
   <div class="flex items-center gap-3 mb-6">
     <button
       (click)="goBack()"
-      class="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+      class="p-2 text-ink/70 hover:text-ink hover:bg-veil/10 rounded-xl transition-colors"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
       </svg>
     </button>
     <div>
-      <h1 class="text-xl font-bold text-white">Configuración de presupuesto</h1>
-      <p class="text-sm text-white/70 mt-0.5">Personaliza tu ciclo de pago y categorías fijas</p>
+      <h1 class="text-xl font-bold text-ink">Configuración de presupuesto</h1>
+      <p class="text-sm text-ink/70 mt-0.5">Personaliza tu ciclo de pago y categorías fijas</p>
     </div>
   </div>
 
   <!-- Pay cycle card -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-5 mb-4">
     <div class="flex items-center gap-2 mb-4">
       <div class="w-8 h-8 rounded-lg bg-accent-400/15 flex items-center justify-center text-base">
         📅
       </div>
-      <h2 class="font-semibold text-white text-sm">Ciclo de pago</h2>
+      <h2 class="font-semibold text-ink text-sm">Ciclo de pago</h2>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-white/80 mb-1.5">
+        <label class="block text-sm font-medium text-ink/80 mb-1.5">
           Día de pago
-          <span class="text-white/40 font-normal ml-1">(1 – 31)</span>
+          <span class="text-ink/40 font-normal ml-1">(1 – 31)</span>
         </label>
         <input
           type="number"
           [(ngModel)]="payDay"
           min="1" max="31"
-          class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
+          class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors"
           placeholder="15"
         >
       </div>
       <div>
-        <label class="block text-sm font-medium text-white/80 mb-1.5">Periodicidad</label>
+        <label class="block text-sm font-medium text-ink/80 mb-1.5">Periodicidad</label>
         <select [(ngModel)]="periodicity"
-          class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+          class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
           @for (p of periodicityOptions; track p) {
             <option [value]="p" class="bg-surface">{{ PERIODICITY_LABELS[p] }}</option>
           }
         </select>
       </div>
       <div class="sm:col-span-2">
-        <label class="block text-sm font-medium text-white/80 mb-1.5">
+        <label class="block text-sm font-medium text-ink/80 mb-1.5">
           Inicio del próximo ciclo
         </label>
         <input
           type="date"
           [(ngModel)]="nextPayDate"
-          class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors"
+          class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors"
         >
-        <p class="text-xs text-white/50 mt-1.5 leading-snug">
+        <p class="text-xs text-ink/50 mt-1.5 leading-snug">
           El ciclo se crea automáticamente desde esta fecha. Si este mes te pagan en un día diferente al habitual, ajústala aquí antes de que termine el ciclo actual.
         </p>
       </div>
@@ -65,36 +65,36 @@
   </div>
 
   <!-- Fixed categories card -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-5 mb-4">
     <div class="flex items-center gap-2 mb-4">
       <div class="w-8 h-8 rounded-lg bg-blue-400/15 flex items-center justify-center text-base">
         📋
       </div>
-      <h2 class="font-semibold text-white text-sm">Categorías fijas</h2>
+      <h2 class="font-semibold text-ink text-sm">Categorías fijas</h2>
     </div>
-    <p class="text-xs text-white/50 mb-4">
+    <p class="text-xs text-ink/50 mb-4">
       Define los montos habituales por categoría. Se usarán como referencia al crear nuevos ciclos.
     </p>
 
     <!-- Existing categories -->
     @if (fixedCategories.length > 0) {
-      <div class="divide-y divide-white/10 mb-4 -mx-5 px-5">
+      <div class="divide-y divide-veil/10 mb-4 -mx-5 px-5">
         @for (fc of fixedCategories; track fc.name; let i = $index) {
           <div class="flex items-center gap-3 py-3">
             <span class="text-xl flex-shrink-0">{{ getCategoryIcon(fc.name) }}</span>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-white truncate">{{ fc.name }}</p>
+              <p class="text-sm font-medium text-ink truncate">{{ fc.name }}</p>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               <input
                 type="text"
                 appAmountInput
                 [(ngModel)]="fc.amount"
-                class="w-32 px-2.5 py-1.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white text-right focus:border-accent-400/60 focus:outline-none transition-colors"
+                class="w-32 px-2.5 py-1.5 bg-veil/10 border border-veil/25 rounded-xl text-sm text-ink text-right focus:border-accent-400/60 focus:outline-none transition-colors"
               >
               <button
                 (click)="removeFixedCategory(i)"
-                class="p-1.5 text-white/40 hover:text-red-300 hover:bg-red-400/15 rounded-lg transition-colors"
+                class="p-1.5 text-ink/40 hover:text-red-300 hover:bg-red-400/15 rounded-lg transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -105,14 +105,14 @@
         }
       </div>
     } @else {
-      <div class="text-center py-6 text-white/50 text-sm mb-4">
+      <div class="text-center py-6 text-ink/50 text-sm mb-4">
         Sin categorías fijas aún. Agrega las que necesites.
       </div>
     }
 
     <!-- Add new category row -->
-    <div class="bg-white/5 rounded-xl p-3 border border-dashed border-white/20">
-      <p class="text-xs font-medium text-white/60 mb-2">Agregar categoría</p>
+    <div class="bg-veil/5 rounded-xl p-3 border border-dashed border-veil/20">
+      <p class="text-xs font-medium text-ink/60 mb-2">Agregar categoría</p>
       <div class="flex gap-2">
         <div class="flex-1">
           <input
@@ -120,18 +120,18 @@
             [(ngModel)]="newCatName"
             list="config-cat-list"
             placeholder="Nombre"
-            class="block w-full px-3 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
+            class="block w-full px-3 py-2.5 bg-veil/10 border border-veil/25 rounded-xl text-sm text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors"
           >
           <datalist id="config-cat-list"></datalist>
         </div>
         <div class="relative">
-          <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-white/40 text-xs">$</span>
+          <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-ink/40 text-xs">$</span>
           <input
             type="text"
             appAmountInput
             [(ngModel)]="newCatAmount"
             placeholder="0"
-            class="block w-28 pl-6 pr-2 py-2.5 bg-white/10 border border-white/25 rounded-xl text-sm text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
+            class="block w-28 pl-6 pr-2 py-2.5 bg-veil/10 border border-veil/25 rounded-xl text-sm text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors"
           >
         </div>
         <button

@@ -21,6 +21,9 @@
   --accent-deep: 59 130 246;
   --on-accent: 26 58 110;
   --surface: 26 58 110;
+  --ink: 255 255 255;
+  --veil: 255 255 255;
+  --chrome-bg: rgba(255, 255, 255, 0.08);
   --chat-1: #13294E;
   --chat-2: #0B1B35;
 }
@@ -36,6 +39,9 @@
   --accent-deep: 13 148 136;
   --on-accent: 6 78 59;
   --surface: 6 95 70;
+  --ink: 255 255 255;
+  --veil: 255 255 255;
+  --chrome-bg: rgba(255, 255, 255, 0.08);
   --chat-1: #053F30;
   --chat-2: #02261C;
 }
@@ -51,6 +57,9 @@
   --accent-deep: 99 102 241;
   --on-accent: 30 27 75;
   --surface: 30 27 75;
+  --ink: 255 255 255;
+  --veil: 255 255 255;
+  --chrome-bg: rgba(255, 255, 255, 0.08);
   --chat-1: #11102E;
   --chat-2: #0A0920;
 }
@@ -66,8 +75,90 @@
   --accent-deep: 244 63 94;
   --on-accent: 88 28 135;
   --surface: 88 28 135;
+  --ink: 255 255 255;
+  --veil: 255 255 255;
+  --chrome-bg: rgba(255, 255, 255, 0.08);
   --chat-1: #3B1262;
   --chat-2: #240B3D;
+}
+
+/* ── Variantes claras: mismo color de marca en chrome (header/nav/sidebar),
+   pero zona de contenido sobre fondo blanco con texto oscuro ─────────────── */
+
+.theme-ocean-light {
+  --bg-1: #ffffff;
+  --bg-2: #f6f9fd;
+  --bg-3: #eaf1fb;
+  --accent-200: 165 243 252;
+  --accent-300: 103 232 249;
+  --accent-400: 34 211 238;
+  --accent-500: 6 182 212;
+  --accent-deep: 59 130 246;
+  --on-accent: 26 58 110;
+  --surface: 255 255 255;
+  --ink: 15 31 56;
+  --veil: 15 31 56;
+  --accent-on-light: 14 116 144;
+  --chrome-bg: linear-gradient(135deg, #1A3A6E 0%, #2563B0 50%, #06B6D4 100%);
+  --chat-1: #ffffff;
+  --chat-2: #eef4fb;
+}
+
+.theme-emerald-light {
+  --bg-1: #ffffff;
+  --bg-2: #f5fbf8;
+  --bg-3: #e7f6ef;
+  --accent-200: 167 243 208;
+  --accent-300: 110 231 183;
+  --accent-400: 52 211 153;
+  --accent-500: 16 185 129;
+  --accent-deep: 13 148 136;
+  --on-accent: 6 78 59;
+  --surface: 255 255 255;
+  --ink: 6 46 35;
+  --veil: 6 46 35;
+  --accent-on-light: 4 120 87;
+  --chrome-bg: linear-gradient(135deg, #064E3B 0%, #0F766E 50%, #10B981 100%);
+  --chat-1: #ffffff;
+  --chat-2: #e9f6f0;
+}
+
+.theme-midnight-light {
+  --bg-1: #ffffff;
+  --bg-2: #f8f7fc;
+  --bg-3: #efeefb;
+  --accent-200: 221 214 254;
+  --accent-300: 196 181 253;
+  --accent-400: 167 139 250;
+  --accent-500: 139 92 246;
+  --accent-deep: 99 102 241;
+  --on-accent: 30 27 75;
+  --surface: 255 255 255;
+  --ink: 23 21 51;
+  --veil: 23 21 51;
+  --accent-on-light: 109 40 217;
+  --chrome-bg: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #4338CA 100%);
+  --chat-1: #ffffff;
+  --chat-2: #f1f0fb;
+}
+
+.theme-sunset-light {
+  --bg-1: #ffffff;
+  --bg-2: #fdf8f3;
+  --bg-3: #fbeede;
+  --accent-200: 253 230 138;
+  --accent-300: 252 211 77;
+  --accent-400: 251 191 36;
+  --accent-500: 245 158 11;
+  --accent-deep: 244 63 94;
+  --on-accent: 88 28 135;
+  --surface: 255 255 255;
+  --ink: 60 22 66;
+  --veil: 60 22 66;
+  --accent-on-light: 180 83 9;
+  --chrome-bg: linear-gradient(135deg, #581C87 0%, #9D174D 50%, #F59E0B 100%);
+  --chat-1: #ffffff;
+  --chat-2: #fcf1e6;
 }
 
 * {
@@ -82,6 +173,30 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Chrome (sidebar, header móvil, navegación inferior): vidrio en temas oscuros,
+   degradado de color de marca en temas claros. Su texto es siempre blanco. */
+.app-chrome {
+  background: var(--chrome-bg);
+}
+
+/* ── Ajustes de contraste para temas claros ────────────────────────────────
+   Solo dentro de <main> (la zona de contenido): el chrome queda fuera y no se
+   altera. Oscurece los textos de color de acento/estado para que sean legibles
+   sobre el fondo blanco. Los temas oscuros no entran aquí (no tienen .theme-light). */
+.theme-light main .text-accent-300,
+.theme-light main .text-accent-300\/80,
+.theme-light main .text-accent-400 { color: rgb(var(--accent-on-light)); }
+.theme-light main .text-emerald-300,
+.theme-light main .text-emerald-200,
+.theme-light main .text-emerald-100 { color: #047857; }
+.theme-light main .text-red-300,
+.theme-light main .text-red-200,
+.theme-light main .text-red-100 { color: #b91c1c; }
+.theme-light main .text-amber-300,
+.theme-light main .text-amber-200 { color: #b45309; }
+.theme-light main .text-sky-300 { color: #0369a1; }
+.theme-light main .text-violet-300 { color: #6d28d9; }
 
 /* Fondo del chat del coach en pantalla completa */
 .chat-screen-bg {
@@ -105,6 +220,37 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Tarjeta de resumen con giro 3D (flip de media vuelta) */
+.flip-card {
+  perspective: 800px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner {
+    transition-duration: 0.01ms;
+  }
 }
 
 .glass {

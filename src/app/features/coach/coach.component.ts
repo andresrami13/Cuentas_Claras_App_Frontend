@@ -183,7 +183,7 @@ export class CoachComponent implements OnInit, OnDestroy {
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^(#{1,3})\s(.+)$/gm, (_, _h, t) => `<span class="font-bold text-white text-base block mb-1">${t}</span>`)
+      .replace(/^(#{1,3})\s(.+)$/gm, (_, _h, t) => `<span class="font-bold text-ink text-base block mb-1">${t}</span>`)
       .replace(/\n\n/g, '</p><p class="mb-2">')
       .replace(/\n/g, '<br>')
       .replace(/^(\d+)\.\s(.+)$/gm, '<li class="ml-4 list-decimal">$2</li>');

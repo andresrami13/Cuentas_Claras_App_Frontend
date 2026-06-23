@@ -117,7 +117,12 @@ export class BudgetService {
     (this._cycle()?.categories ?? []).reduce((s, c) => s + c.spent, 0)
   );
 
-  readonly totalAvailable = computed(() => this.totalAssigned() - this.totalSpent());
+  // Suma el disponible de cada categoría, contando solo lo positivo: una
+  // categoría sobregirada (disponible negativo) aporta 0, no resta del total.
+  // Así coincide con sumar a mano los "disponible" verdes que se muestran.
+  readonly totalAvailable = computed(() =>
+    (this._cycle()?.categories ?? []).reduce((s, c) => s + Math.max(0, c.available), 0)
+  );
 
   private get documentNumber(): string {
     return this.auth.user()?.documentNumber ?? '';

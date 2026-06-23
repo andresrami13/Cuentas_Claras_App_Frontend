@@ -21,6 +21,11 @@ module.exports = {
         },
         'on-accent': 'rgb(var(--on-accent) / <alpha-value>)',
         surface: 'rgb(var(--surface) / <alpha-value>)',
+        // Tokens semánticos para soportar fondo claro: 'ink' = texto principal,
+        // 'veil' = velo translúcido de tarjetas/bordes. En temas oscuros ambos
+        // son blancos (idéntico al diseño previo); en temas claros, oscuros.
+        ink: 'rgb(var(--ink) / <alpha-value>)',
+        veil: 'rgb(var(--veil) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],

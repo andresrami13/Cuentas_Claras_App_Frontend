@@ -2,30 +2,30 @@
 
   <!-- Header -->
   <div class="mb-6">
-    <h1 class="text-xl md:text-2xl font-bold text-white">Reportes financieros</h1>
-    <p class="text-sm text-white/70 mt-0.5">Resumen de tus finanzas</p>
+    <h1 class="text-xl md:text-2xl font-bold text-ink">Reportes financieros</h1>
+    <p class="text-sm text-ink/70 mt-0.5">Resumen de tus finanzas</p>
   </div>
 
   <!-- Summary Cards -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
-      <p class="text-xs text-white/70 font-medium mb-1.5">Total ingresos</p>
+    <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-veil/15">
+      <p class="text-xs text-ink/70 font-medium mb-1.5">Total ingresos</p>
       <p class="text-emerald-300 font-bold text-base">{{ formatCurrency(totalIncome()) }}</p>
     </div>
-    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
-      <p class="text-xs text-white/70 font-medium mb-1.5">Total egresos</p>
+    <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-veil/15">
+      <p class="text-xs text-ink/70 font-medium mb-1.5">Total egresos</p>
       <p class="text-red-300 font-bold text-base">{{ formatCurrency(totalExpenses()) }}</p>
     </div>
-    <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]">
-      <p class="text-xs text-white/60 font-medium mb-1.5">Balance neto</p>
+    <div class="bg-veil/20 backdrop-blur-md border border-veil/30 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]">
+      <p class="text-xs text-ink/60 font-medium mb-1.5">Balance neto</p>
       <p class="font-bold text-base"
         [class.text-accent-300]="balance() >= 0"
         [class.text-red-300]="balance() < 0">
         {{ formatCurrency(balance()) }}
       </p>
     </div>
-    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
-      <p class="text-xs text-white/70 font-medium mb-1.5">Tasa de ahorro</p>
+    <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-veil/15">
+      <p class="text-xs text-ink/70 font-medium mb-1.5">Tasa de ahorro</p>
       <p class="font-bold text-base"
         [class.text-emerald-300]="savingsRate >= 20"
         [class.text-amber-300]="savingsRate >= 10 && savingsRate < 20"
@@ -36,8 +36,8 @@
   </div>
 
   <!-- Monthly Chart -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
-    <h2 class="font-semibold text-white text-sm mb-4">Ingresos vs Egresos por mes</h2>
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-5 mb-4">
+    <h2 class="font-semibold text-ink text-sm mb-4">Ingresos vs Egresos por mes</h2>
     @if (monthlyChartOptions.series) {
       <apx-chart
         [series]="monthlyChartOptions.series"
@@ -56,8 +56,8 @@
   </div>
 
   <!-- Category Chart -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 mb-4">
-    <h2 class="font-semibold text-white text-sm mb-4">Movimientos por categoría</h2>
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-5 mb-4">
+    <h2 class="font-semibold text-ink text-sm mb-4">Movimientos por categoría</h2>
     @if (categoryChartOptions.series) {
       <apx-chart
         [series]="categoryChartOptions.series"
@@ -74,21 +74,21 @@
   </div>
 
   <!-- Top Expense Categories -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5">
-    <h2 class="font-semibold text-white text-sm mb-4">Top categorías de gasto</h2>
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-5">
+    <h2 class="font-semibold text-ink text-sm mb-4">Top categorías de gasto</h2>
     <div class="space-y-3">
       @for (cat of topExpenseCategories; track cat.category) {
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-sm text-white font-medium">{{ cat.label }}</span>
+            <span class="text-sm text-ink font-medium">{{ cat.label }}</span>
             <span class="text-sm font-bold text-red-300">{{ formatCurrency(cat.amount) }}</span>
           </div>
-          <div class="h-2 bg-white/15 rounded-full overflow-hidden">
+          <div class="h-2 bg-veil/15 rounded-full overflow-hidden">
             <div class="h-full bg-red-400 rounded-full transition-all duration-500"
               [style.width.%]="(cat.amount / totalExpenses()) * 100">
             </div>
           </div>
-          <p class="text-xs text-white/50 mt-1">{{ ((cat.amount / totalExpenses()) * 100).toFixed(1) }}% del total de egresos</p>
+          <p class="text-xs text-ink/50 mt-1">{{ ((cat.amount / totalExpenses()) * 100).toFixed(1) }}% del total de egresos</p>
         </div>
       }
     </div>

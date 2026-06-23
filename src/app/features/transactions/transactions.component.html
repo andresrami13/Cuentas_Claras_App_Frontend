@@ -3,14 +3,14 @@
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-xl md:text-2xl font-bold text-white">Hola, {{ getFirstName() }} 👋</h1>
-      <p class="text-sm text-white/70 mt-0.5">Resumen de tus movimientos</p>
+      <h1 class="text-xl md:text-2xl font-bold text-ink">Hola, {{ getFirstName() }} 👋</h1>
+      <p class="text-sm text-ink/70 mt-0.5">Resumen de tus movimientos</p>
     </div>
     <div class="flex items-center gap-2">
       <button
         (click)="guide.reopen()"
         title="¿Cómo funciona?"
-        class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-accent-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
+        class="w-9 h-9 flex items-center justify-center bg-veil/10 hover:bg-veil/20 border border-veil/20 text-accent-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
       >
         ?
       </button>
@@ -39,69 +39,69 @@
   <!-- Summary Cards -->
   <div class="grid grid-cols-3 gap-3 mb-6">
     <!-- Income -->
-    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+    <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-veil/15">
       <div class="flex items-center gap-2 mb-2">
         <div class="w-8 h-8 rounded-lg bg-emerald-400/20 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
           </svg>
         </div>
-        <span class="text-xs text-white/70 font-medium hidden sm:block">Ingresos</span>
+        <span class="text-xs text-ink/70 font-medium hidden sm:block">Ingresos</span>
       </div>
       <p class="text-emerald-300 font-bold text-base md:text-lg leading-tight">
         {{ formatCompact(totalIncome()) }}
       </p>
-      <p class="text-xs text-white/50 mt-0.5 sm:hidden">Ingresos</p>
+      <p class="text-xs text-ink/50 mt-0.5 sm:hidden">Ingresos</p>
     </div>
 
     <!-- Expenses -->
-    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+    <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01] hover:bg-veil/15">
       <div class="flex items-center gap-2 mb-2">
         <div class="w-8 h-8 rounded-lg bg-red-400/20 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
           </svg>
         </div>
-        <span class="text-xs text-white/70 font-medium hidden sm:block">Egresos</span>
+        <span class="text-xs text-ink/70 font-medium hidden sm:block">Egresos</span>
       </div>
       <p class="text-red-300 font-bold text-base md:text-lg leading-tight">
         {{ formatCompact(totalExpenses()) }}
       </p>
-      <p class="text-xs text-white/50 mt-0.5 sm:hidden">Egresos</p>
+      <p class="text-xs text-ink/50 mt-0.5 sm:hidden">Egresos</p>
     </div>
 
     <!-- Balance -->
-    <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]">
+    <div class="bg-veil/20 backdrop-blur-md border border-veil/30 rounded-2xl p-4 transition-all duration-200 hover:scale-[1.01]">
       <div class="flex items-center gap-2 mb-2">
         <div class="w-8 h-8 rounded-lg bg-accent-400/20 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
           </svg>
         </div>
-        <span class="text-xs text-white/60 font-medium hidden sm:block">Balance</span>
+        <span class="text-xs text-ink/60 font-medium hidden sm:block">Balance</span>
       </div>
       <p class="font-bold text-base md:text-lg leading-tight"
         [class.text-accent-300]="balance() >= 0"
         [class.text-red-300]="balance() < 0">
         {{ formatCompact(balance()) }}
       </p>
-      <p class="text-xs text-white/40 mt-0.5 sm:hidden">Balance</p>
+      <p class="text-xs text-ink/40 mt-0.5 sm:hidden">Balance</p>
     </div>
   </div>
 
   <!-- Filter Bar -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl mb-4">
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl mb-4">
     <button
       (click)="showFilters.update(v => !v)"
-      class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-white/70"
+      class="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-ink/70"
     >
       <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-ink/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
         </svg>
         Filtros
       </div>
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white/40 transition-transform"
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-ink/40 transition-transform"
         [class.rotate-180]="showFilters()"
         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -109,11 +109,11 @@
     </button>
 
     @if (showFilters()) {
-      <div class="px-4 pb-4 border-t border-white/10 pt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="px-4 pb-4 border-t border-veil/10 pt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
         <div>
-          <label class="block text-xs font-medium text-white/60 mb-1">Tipo</label>
+          <label class="block text-xs font-medium text-ink/60 mb-1">Tipo</label>
           <select [(ngModel)]="filter.type"
-            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
+            class="w-full text-sm bg-veil/10 border border-veil/25 rounded-xl px-2.5 py-2 text-ink focus:border-accent-400/60 focus:outline-none">
             <option value="all" class="bg-surface">Todos</option>
             <option value="income" class="bg-surface">Ingreso</option>
             <option value="expense" class="bg-surface">Egreso</option>
@@ -121,9 +121,9 @@
         </div>
         @if (filter.type === 'expense') {
           <div>
-            <label class="block text-xs font-medium text-white/60 mb-1">Categoría</label>
+            <label class="block text-xs font-medium text-ink/60 mb-1">Categoría</label>
             <select [(ngModel)]="filter.budgetCategoryId"
-              class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
+              class="w-full text-sm bg-veil/10 border border-veil/25 rounded-xl px-2.5 py-2 text-ink focus:border-accent-400/60 focus:outline-none">
               <option [ngValue]="'all'" class="bg-surface">Todas</option>
               @for (cat of budgetCategories; track cat.id) {
                 <option [ngValue]="+cat.id" class="bg-surface">{{ cat.name }}</option>
@@ -132,14 +132,14 @@
           </div>
         }
         <div>
-          <label class="block text-xs font-medium text-white/60 mb-1">Desde</label>
+          <label class="block text-xs font-medium text-ink/60 mb-1">Desde</label>
           <input type="date" [(ngModel)]="filter.dateFrom"
-            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
+            class="w-full text-sm bg-veil/10 border border-veil/25 rounded-xl px-2.5 py-2 text-ink focus:border-accent-400/60 focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-medium text-white/60 mb-1">Hasta</label>
+          <label class="block text-xs font-medium text-ink/60 mb-1">Hasta</label>
           <input type="date" [(ngModel)]="filter.dateTo"
-            class="w-full text-sm bg-white/10 border border-white/25 rounded-xl px-2.5 py-2 text-white focus:border-accent-400/60 focus:outline-none">
+            class="w-full text-sm bg-veil/10 border border-veil/25 rounded-xl px-2.5 py-2 text-ink focus:border-accent-400/60 focus:outline-none">
         </div>
         <div class="col-span-2 md:col-span-4 flex justify-end">
           <button (click)="resetFilters()" class="text-xs text-accent-300 font-medium hover:text-accent-200 hover:underline">
@@ -151,24 +151,24 @@
   </div>
 
   <!-- Transaction List -->
-  <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl overflow-hidden">
-    <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-      <h2 class="font-semibold text-white text-sm">
+  <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-veil/10 flex items-center justify-between">
+      <h2 class="font-semibold text-ink text-sm">
         Movimientos
-        <span class="text-white/40 font-normal ml-1">({{ filteredTransactions.length }})</span>
+        <span class="text-ink/40 font-normal ml-1">({{ filteredTransactions.length }})</span>
       </h2>
     </div>
 
     @if (filteredTransactions.length === 0) {
       <div class="flex flex-col items-center justify-center py-14 text-center px-4">
         <div class="text-4xl mb-3">📭</div>
-        <p class="text-white/70 text-sm font-medium">No hay movimientos</p>
-        <p class="text-white/50 text-xs mt-1">Agrega un ingreso o egreso para empezar</p>
+        <p class="text-ink/70 text-sm font-medium">No hay movimientos</p>
+        <p class="text-ink/50 text-xs mt-1">Agrega un ingreso o egreso para empezar</p>
       </div>
     } @else {
       <div>
         @for (tx of filteredTransactions; track tx.id) {
-          <div class="flex items-center gap-3 px-4 py-3.5 border-b border-white/10 hover:bg-white/5 transition-colors group">
+          <div class="flex items-center gap-3 px-4 py-3.5 border-b border-veil/10 hover:bg-veil/5 transition-colors group">
             <!-- Category Icon -->
             <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold"
               [class.bg-emerald-400/15]="tx.type === 'income'"
@@ -180,12 +180,12 @@
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-white truncate">
+              <p class="text-sm font-medium text-ink truncate">
                 {{ tx.description || tx.categoryName }}
               </p>
               <div class="flex items-center gap-1.5 mt-0.5">
-                <span class="text-xs text-white/40">{{ tx.date | date:'dd/MM/yyyy' }}</span>
-                <span class="text-white/30">·</span>
+                <span class="text-xs text-ink/40">{{ tx.date | date:'dd/MM/yyyy' }}</span>
+                <span class="text-ink/30">·</span>
                 <span class="text-xs px-1.5 py-0.5 rounded-full font-medium"
                   [class.bg-emerald-400/15]="tx.type === 'income'"
                   [class.text-emerald-300]="tx.type === 'income'"
@@ -205,13 +205,13 @@
               </span>
               <div class="hidden group-hover:flex items-center gap-1">
                 <button (click)="openEditForm(tx)"
-                  class="p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  class="p-1.5 text-ink/40 hover:text-ink hover:bg-veil/10 rounded-lg transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
                 <button (click)="confirmDelete(tx.id)"
-                  class="p-1.5 text-white/40 hover:text-red-300 hover:bg-red-400/15 rounded-lg transition-colors">
+                  class="p-1.5 text-ink/40 hover:text-red-300 hover:bg-red-400/15 rounded-lg transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                   </svg>
@@ -232,13 +232,13 @@
 @if (showForm()) {
   <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeForm()"></div>
-    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-white/20 md:border md:rounded-2xl w-full md:max-w-lg rounded-t-3xl shadow-2xl z-10 max-h-[95vh] overflow-y-auto">
+    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-veil/20 md:border md:rounded-2xl w-full md:max-w-lg rounded-t-3xl shadow-2xl z-10 max-h-[95vh] overflow-y-auto">
 
-      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
-        <h3 class="text-base font-bold text-white">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-veil/10">
+        <h3 class="text-base font-bold text-ink">
           {{ editingId() ? 'Editar movimiento' : 'Nuevo movimiento' }}
         </h3>
-        <button (click)="closeForm()" class="text-white/40 hover:text-white/70 p-1">
+        <button (click)="closeForm()" class="text-ink/40 hover:text-ink/70 p-1">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -248,24 +248,24 @@
       <div class="px-5 py-4 space-y-4">
         <!-- Type Toggle -->
         <div>
-          <label class="block text-sm font-medium text-white/80 mb-2">Tipo</label>
-          <div class="flex rounded-xl border border-white/20 overflow-hidden">
+          <label class="block text-sm font-medium text-ink/80 mb-2">Tipo</label>
+          <div class="flex rounded-xl border border-veil/20 overflow-hidden">
             <button type="button"
               [class.bg-emerald-400]="form.type === 'income'"
-              [class.text-white]="form.type === 'income'"
-              [class.bg-white/5]="form.type !== 'income'"
-              [class.text-white/50]="form.type !== 'income'"
+              [class.text-ink]="form.type === 'income'"
+              [class.bg-veil/5]="form.type !== 'income'"
+              [class.text-ink/50]="form.type !== 'income'"
               (click)="form.type = 'income'; onTypeChange()"
               class="flex-1 py-2.5 text-sm font-semibold transition-colors">
               ↑ Ingreso
             </button>
             <button type="button"
               [class.bg-red-400]="form.type === 'expense'"
-              [class.text-white]="form.type === 'expense'"
-              [class.bg-white/5]="form.type !== 'expense'"
-              [class.text-white/50]="form.type !== 'expense'"
+              [class.text-ink]="form.type === 'expense'"
+              [class.bg-veil/5]="form.type !== 'expense'"
+              [class.text-ink/50]="form.type !== 'expense'"
               (click)="form.type = 'expense'; onTypeChange()"
-              class="flex-1 py-2.5 text-sm font-semibold transition-colors border-l border-white/20">
+              class="flex-1 py-2.5 text-sm font-semibold transition-colors border-l border-veil/20">
               ↓ Egreso
             </button>
           </div>
@@ -273,33 +273,33 @@
 
         <!-- Amount -->
         <div>
-          <label class="block text-sm font-medium text-white/80 mb-1.5">Monto</label>
+          <label class="block text-sm font-medium text-ink/80 mb-1.5">Monto</label>
           <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-white/40 text-sm font-medium">$</span>
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-ink/40 text-sm font-medium">$</span>
             <input type="text" appAmountInput [(ngModel)]="form.amount"
-              class="block w-full pl-7 pr-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
+              class="block w-full pl-7 pr-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors"
               placeholder="0">
           </div>
         </div>
 
         <!-- Date -->
         <div>
-          <label class="block text-sm font-medium text-white/80 mb-1.5">Fecha</label>
+          <label class="block text-sm font-medium text-ink/80 mb-1.5">Fecha</label>
           <input type="date" [(ngModel)]="form.date"
-            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+            class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
         </div>
 
         <!-- Category (expense) -->
         @if (form.type === 'expense') {
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Categoría <span class="text-red-300">*</span></label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Categoría <span class="text-red-300">*</span></label>
             @if (budgetCategories.length === 0) {
               <p class="text-sm text-amber-300 bg-amber-400/20 px-3 py-2.5 rounded-xl border border-amber-400/30">
                 No hay ciclo de presupuesto activo. Crea uno en la sección Presupuesto.
               </p>
             } @else {
               <select [(ngModel)]="form.budgetCategoryId"
-                class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+                class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
                 <option [ngValue]="null" class="bg-surface">Selecciona una categoría</option>
                 @for (cat of budgetCategories; track cat.id) {
                   <option [ngValue]="+cat.id" class="bg-surface">{{ cat.name }}</option>
@@ -312,9 +312,9 @@
         <!-- Income type -->
         @if (form.type === 'income') {
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Tipo de ingreso <span class="text-red-300">*</span></label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Tipo de ingreso <span class="text-red-300">*</span></label>
             <select [(ngModel)]="form.incomeType"
-              class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+              class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
               <option value="" class="bg-surface">Selecciona un tipo</option>
               @for (t of INCOME_TYPES; track t.value) {
                 <option [value]="t.value" class="bg-surface">{{ t.label }}</option>
@@ -325,9 +325,9 @@
 
         <!-- Description -->
         <div>
-          <label class="block text-sm font-medium text-white/80 mb-1.5">Descripción <span class="text-white/40">(opcional)</span></label>
+          <label class="block text-sm font-medium text-ink/80 mb-1.5">Descripción <span class="text-ink/40">(opcional)</span></label>
           <input type="text" [(ngModel)]="form.description"
-            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors"
+            class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors"
             placeholder="Ej. Compra supermercado">
         </div>
 
@@ -339,7 +339,7 @@
 
         <div class="flex gap-3 pt-2 pb-2">
           <button type="button" (click)="closeForm()"
-            class="flex-1 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95">
+            class="flex-1 py-3 bg-veil/10 hover:bg-veil/20 border border-veil/20 rounded-xl text-sm font-semibold text-ink transition-all duration-200 active:scale-95">
             Cancelar
           </button>
           <button type="button" (click)="saveForm()"
@@ -365,13 +365,13 @@
 @if (deleteConfirmId()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="cancelDelete()"></div>
-    <div class="relative bg-surface/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+    <div class="relative bg-surface/80 backdrop-blur-xl border border-veil/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
       <div class="text-center">
         <div class="text-4xl mb-3">🗑️</div>
-        <h3 class="font-bold text-white mb-1">¿Eliminar movimiento?</h3>
-        <p class="text-sm text-white/70 mb-5">Esta acción no se puede deshacer.</p>
+        <h3 class="font-bold text-ink mb-1">¿Eliminar movimiento?</h3>
+        <p class="text-sm text-ink/70 mb-5">Esta acción no se puede deshacer.</p>
         <div class="flex gap-3">
-          <button (click)="cancelDelete()" class="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95">
+          <button (click)="cancelDelete()" class="flex-1 py-2.5 bg-veil/10 hover:bg-veil/20 border border-veil/20 rounded-xl text-sm font-semibold text-ink transition-all duration-200 active:scale-95">
             Cancelar
           </button>
           <button (click)="doDelete()" class="flex-1 py-2.5 bg-red-500/70 hover:bg-red-400/80 text-white rounded-xl text-sm font-bold transition-all duration-200 active:scale-95">

@@ -3,14 +3,14 @@
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-xl md:text-2xl font-bold text-white">Mis Metas</h1>
-      <p class="text-sm text-white/70 mt-0.5">Gestiona tus objetivos financieros</p>
+      <h1 class="text-xl md:text-2xl font-bold text-ink">Mis Metas</h1>
+      <p class="text-sm text-ink/70 mt-0.5">Gestiona tus objetivos financieros</p>
     </div>
     <div class="flex items-center gap-2">
       <button
         (click)="guide.reopen()"
         title="¿Cómo funciona?"
-        class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-accent-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
+        class="w-9 h-9 flex items-center justify-center bg-veil/10 hover:bg-veil/20 border border-veil/20 text-accent-300 font-bold rounded-xl transition-all duration-200 active:scale-95"
       >
         ?
       </button>
@@ -39,17 +39,17 @@
   @if (loading()) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
       @for (i of [1,2,3,4]; track i) {
-        <div class="bg-white/10 rounded-2xl h-52"></div>
+        <div class="bg-veil/10 rounded-2xl h-52"></div>
       }
     </div>
   }
 
   <!-- Empty state -->
   @if (!loading() && goals().length === 0) {
-    <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-10 text-center">
+    <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-10 text-center">
       <div class="text-5xl mb-4">🎯</div>
-      <h2 class="font-bold text-white text-lg mb-2">Aún no tienes metas</h2>
-      <p class="text-sm text-white/70 max-w-xs mx-auto mb-6">
+      <h2 class="font-bold text-ink text-lg mb-2">Aún no tienes metas</h2>
+      <p class="text-sm text-ink/70 max-w-xs mx-auto mb-6">
         Crea tu primera meta financiera para que el Coach IA pueda asesorarte y ayudarte a alcanzarla.
       </p>
       <button
@@ -67,17 +67,17 @@
   @if (!loading() && goals().length > 0) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       @for (goal of goals(); track goal.id) {
-        <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl overflow-hidden group transition-all duration-200 hover:scale-[1.01] hover:bg-white/15">
+        <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl overflow-hidden group transition-all duration-200 hover:scale-[1.01] hover:bg-veil/15">
 
           <!-- Card header -->
-          <div class="bg-white/15 px-5 py-4">
+          <div class="bg-veil/15 px-5 py-4">
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="text-2xl flex-shrink-0">🎯</div>
                 <div class="min-w-0">
-                  <h3 class="font-bold text-white text-base leading-tight truncate">{{ goal.name }}</h3>
+                  <h3 class="font-bold text-ink text-base leading-tight truncate">{{ goal.name }}</h3>
                   @if (goal.description) {
-                    <p class="text-xs text-white/50 mt-0.5 truncate">{{ goal.description }}</p>
+                    <p class="text-xs text-ink/50 mt-0.5 truncate">{{ goal.description }}</p>
                   }
                 </div>
               </div>
@@ -90,9 +90,9 @@
                   [class.bg-emerald-400/20]="goal.status === 'COMPLETED'"
                   [class.text-emerald-300]="goal.status === 'COMPLETED'"
                   [class.border-emerald-400/30]="goal.status === 'COMPLETED'"
-                  [class.bg-white/10]="goal.status === 'CANCELLED'"
-                  [class.text-white/50]="goal.status === 'CANCELLED'"
-                  [class.border-white/20]="goal.status === 'CANCELLED'">
+                  [class.bg-veil/10]="goal.status === 'CANCELLED'"
+                  [class.text-ink/50]="goal.status === 'CANCELLED'"
+                  [class.border-veil/20]="goal.status === 'CANCELLED'">
                   {{ STATUS_LABELS[goal.status] }}
                 </span>
               </div>
@@ -101,10 +101,10 @@
             <!-- Progress bar -->
             <div class="mt-4">
               <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs text-white/50">Progreso</span>
+                <span class="text-xs text-ink/50">Progreso</span>
                 <span class="text-sm font-bold text-accent-300">{{ progressPercent(goal) }}%</span>
               </div>
-              <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div class="h-2 bg-veil/10 rounded-full overflow-hidden">
                 <div class="h-full bg-accent-400 rounded-full transition-all duration-700"
                   [style.width.%]="progressPercent(goal)">
                 </div>
@@ -116,19 +116,19 @@
           <div class="px-5 py-4">
             <div class="grid grid-cols-3 gap-3 mb-4">
               <div class="text-center">
-                <p class="text-xs text-white/50 mb-1">Acumulado</p>
+                <p class="text-xs text-ink/50 mb-1">Acumulado</p>
                 <p class="text-sm font-bold text-emerald-300">{{ formatCurrency(goal.currentAmount) }}</p>
               </div>
               <div class="text-center">
-                <p class="text-xs text-white/50 mb-1">Meta</p>
-                <p class="text-sm font-bold text-white">{{ formatCurrency(goal.targetAmount) }}</p>
+                <p class="text-xs text-ink/50 mb-1">Meta</p>
+                <p class="text-sm font-bold text-ink">{{ formatCurrency(goal.targetAmount) }}</p>
               </div>
               <div class="text-center">
-                <p class="text-xs text-white/50 mb-1">Días</p>
+                <p class="text-xs text-ink/50 mb-1">Días</p>
                 <p class="text-sm font-bold"
                   [class.text-accent-300]="daysLeft(goal.deadline) > 30"
                   [class.text-red-300]="daysLeft(goal.deadline) <= 30 && daysLeft(goal.deadline) > 0"
-                  [class.text-white/40]="daysLeft(goal.deadline) === 0">
+                  [class.text-ink/40]="daysLeft(goal.deadline) === 0">
                   {{ daysLeft(goal.deadline) > 0 ? daysLeft(goal.deadline) : 'Vencida' }}
                 </p>
               </div>
@@ -142,13 +142,13 @@
               </a>
               <div class="flex items-center gap-1">
                 <button (click)="openEditForm(goal)"
-                  class="p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  class="p-1.5 text-ink/40 hover:text-ink hover:bg-veil/10 rounded-lg transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
                 <button (click)="confirmDelete(goal.id)"
-                  class="p-1.5 text-white/40 hover:text-red-300 hover:bg-red-400/15 rounded-lg transition-colors">
+                  class="p-1.5 text-ink/40 hover:text-red-300 hover:bg-red-400/15 rounded-lg transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                   </svg>
@@ -165,7 +165,7 @@
       <div class="mt-5 bg-accent-400/10 border border-accent-400/20 rounded-2xl p-4 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <img src="https://i.ibb.co/60kjzFsJ/Gemini-Generated-Image-gzmgxugzmgxugzmg-removebg-preview.webp" alt="Coach IA" class="w-9 h-9 object-contain"/>
-          <p class="text-sm text-white font-medium">¿Quieres consejos para alcanzar tus metas?</p>
+          <p class="text-sm text-ink font-medium">¿Quieres consejos para alcanzar tus metas?</p>
         </div>
         <a routerLink="/coach"
           class="flex-shrink-0 text-sm font-bold text-on-accent bg-accent-400/80 hover:bg-accent-300/90 px-4 py-2 rounded-xl transition-all duration-200 active:scale-95">
@@ -184,13 +184,13 @@
 @if (showForm()) {
   <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeForm()"></div>
-    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-white/20 md:border md:rounded-2xl w-full md:max-w-lg rounded-t-3xl shadow-2xl z-10 max-h-[95vh] overflow-y-auto">
+    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-veil/20 md:border md:rounded-2xl w-full md:max-w-lg rounded-t-3xl shadow-2xl z-10 max-h-[95vh] overflow-y-auto">
 
-      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
-        <h3 class="text-base font-bold text-white">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-veil/10">
+        <h3 class="text-base font-bold text-ink">
           {{ editingId() ? 'Editar meta' : 'Nueva meta' }}
         </h3>
-        <button (click)="closeForm()" class="text-white/40 hover:text-white/70 p-1">
+        <button (click)="closeForm()" class="text-ink/40 hover:text-ink/70 p-1">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -201,36 +201,36 @@
 
         <!-- Nombre -->
         <div>
-          <label class="block text-sm font-medium text-white/80 mb-1.5">Nombre</label>
+          <label class="block text-sm font-medium text-ink/80 mb-1.5">Nombre</label>
           <input type="text" [(ngModel)]="form.name" placeholder="Ej. Fondo de emergencia"
-            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors">
+            class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors">
         </div>
 
         <!-- Descripción -->
         <div>
-          <label class="block text-sm font-medium text-white/80 mb-1.5">Descripción <span class="text-white/40">(opcional)</span></label>
+          <label class="block text-sm font-medium text-ink/80 mb-1.5">Descripción <span class="text-ink/40">(opcional)</span></label>
           <input type="text" [(ngModel)]="form.description" placeholder="Ej. 3 meses de gastos cubiertos"
-            class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors">
+            class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors">
         </div>
 
         <!-- Monto objetivo / Monto ahorrado -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Monto objetivo</label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Monto objetivo</label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-white/40 text-sm font-medium">$</span>
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-ink/40 text-sm font-medium">$</span>
               <input type="text" inputmode="numeric" [value]="targetAmountDisplay"
                 (input)="onAmountInput('targetAmount', $event)" placeholder="0"
-                class="block w-full pl-7 pr-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors">
+                class="block w-full pl-7 pr-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors">
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Ya ahorrado</label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Ya ahorrado</label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-white/40 text-sm font-medium">$</span>
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-ink/40 text-sm font-medium">$</span>
               <input type="text" inputmode="numeric" [value]="currentAmountDisplay"
                 (input)="onAmountInput('currentAmount', $event)" placeholder="0"
-                class="block w-full pl-7 pr-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder:text-white/40 focus:border-accent-400/60 focus:outline-none transition-colors">
+                class="block w-full pl-7 pr-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors">
             </div>
           </div>
         </div>
@@ -238,23 +238,23 @@
         <!-- Fecha inicio / Fecha límite -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Fecha inicio</label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Fecha inicio</label>
             <input type="date" [(ngModel)]="form.startDate"
-              class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+              class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Fecha límite</label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Fecha límite</label>
             <input type="date" [(ngModel)]="form.targetDate"
-              class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+              class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
           </div>
         </div>
 
         <!-- Estado (solo al editar) -->
         @if (editingId()) {
           <div>
-            <label class="block text-sm font-medium text-white/80 mb-1.5">Estado</label>
+            <label class="block text-sm font-medium text-ink/80 mb-1.5">Estado</label>
             <select [(ngModel)]="form.status"
-              class="block w-full px-3 py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:border-accent-400/60 focus:outline-none transition-colors">
+              class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
               @for (s of statuses; track s) {
                 <option [value]="s" class="bg-surface">{{ STATUS_LABELS[s] }}</option>
               }
@@ -270,7 +270,7 @@
 
         <div class="flex gap-3 pt-2 pb-2">
           <button type="button" (click)="closeForm()"
-            class="flex-1 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95">
+            class="flex-1 py-3 bg-veil/10 hover:bg-veil/20 border border-veil/20 rounded-xl text-sm font-semibold text-ink transition-all duration-200 active:scale-95">
             Cancelar
           </button>
           <button type="button" (click)="saveForm()"
@@ -296,11 +296,11 @@
 @if (deleteConfirmId()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="cancelDelete()"></div>
-    <div class="relative bg-surface/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+    <div class="relative bg-surface/80 backdrop-blur-xl border border-veil/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
       <div class="text-center">
         <div class="text-4xl mb-3">🗑️</div>
-        <h3 class="font-bold text-white mb-1">¿Eliminar meta?</h3>
-        <p class="text-sm text-white/70 mb-5">Esta acción no se puede deshacer.</p>
+        <h3 class="font-bold text-ink mb-1">¿Eliminar meta?</h3>
+        <p class="text-sm text-ink/70 mb-5">Esta acción no se puede deshacer.</p>
         @if (deleteError()) {
           <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2 rounded-xl mb-4">
             {{ deleteError() }}
@@ -308,7 +308,7 @@
         }
         <div class="flex gap-3">
           <button (click)="cancelDelete()"
-            class="flex-1 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95">
+            class="flex-1 py-2.5 bg-veil/10 hover:bg-veil/20 border border-veil/20 rounded-xl text-sm font-semibold text-ink transition-all duration-200 active:scale-95">
             Cancelar
           </button>
           <button (click)="doDelete()"
