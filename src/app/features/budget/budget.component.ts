@@ -1,7 +1,10 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
+import { DecimalPipe, NgTemplateOutlet, NgClass } from '@angular/common';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { CATEGORY_ICON_GROUPS, getCategoryIconData, DEFAULT_CATEGORY_ICON } from '../../shared/category-icons';
 import { AmountInputDirective } from '../../shared/directives/amount-input.directive';
 import { FeatureGuideComponent } from '../../shared/components/feature-guide/feature-guide.component';
 import { FabMenuComponent, FabAction } from '../../shared/components/fab-menu/fab-menu.component';
@@ -16,13 +19,14 @@ const EMPTY_TX_FORM: TransactionForm = {
   amount: null,
   date: new Date().toISOString().split('T')[0],
   budgetCategoryId: null,
+  accountId: null,
   incomeType: '',
   description: '',
 };
 
 @Component({
   selector: 'app-budget',
-  imports: [FormsModule, DecimalPipe, NgTemplateOutlet, AmountInputDirective, FeatureGuideComponent, FabMenuComponent],
+  imports: [FormsModule, DecimalPipe, NgTemplateOutlet, NgClass, DragDropModule, LucideAngularModule, AmountInputDirective, FeatureGuideComponent, FabMenuComponent],
   templateUrl: './budget.component.html',
 })
 export class BudgetComponent implements OnInit {
@@ -149,6 +153,9 @@ export class BudgetComponent implements OnInit {
         }
       }
     }
+
+    this.loadCategoryOrder();
+    this.loadCategoryIcons();
   }
 
   // ── Computed state helpers ─────────────────────────────────────────────────
@@ -180,7 +187,7 @@ export class BudgetComponent implements OnInit {
   }
 
   get activeCategories(): BudgetCategory[] {
-    return this.budgetCategories.filter(c => c.spent < c.assigned);
+    return this.applyOrder(this.budgetCategories.filter(c => c.spent < c.assigned));
   }
 
   get completedCategories(): BudgetCategory[] {
@@ -188,6 +195,53 @@ export class BudgetComponent implements OnInit {
   }
 
   showCompletadas = signal(false);
+
+  // ── Orden personalizado de categorías (drag & drop) ────────────────────────
+  // Se guarda en localStorage por ciclo: una lista de ids en el orden preferido.
+  // Las categorías que no estén en la lista (nuevas) caen al final.
+  private readonly categoryOrder = signal<string[]>([]);
+
+  private orderStorageKey(): string | null {
+    const id = this.cycle()?.id;
+    return id ? `budget:catOrder:${id}` : null;
+  }
+
+  private loadCategoryOrder(): void {
+    const key = this.orderStorageKey();
+    if (!key) { this.categoryOrder.set([]); return; }
+    try {
+      const raw = localStorage.getItem(key);
+      this.categoryOrder.set(raw ? JSON.parse(raw) : []);
+    } catch {
+      this.categoryOrder.set([]);
+    }
+  }
+
+  private saveCategoryOrder(ids: string[]): void {
+    this.categoryOrder.set(ids);
+    const key = this.orderStorageKey();
+    if (key) {
+      try { localStorage.setItem(key, JSON.stringify(ids)); } catch { /* sin persistencia disponible */ }
+    }
+  }
+
+  // Ordena según la preferencia guardada; mantiene estable el resto.
+  private applyOrder(cats: BudgetCategory[]): BudgetCategory[] {
+    const order = this.categoryOrder();
+    if (order.length === 0) return cats;
+    const rank = (id: string) => {
+      const i = order.indexOf(id);
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return [...cats].sort((a, b) => rank(a.id) - rank(b.id));
+  }
+
+  onCategoryDrop(event: CdkDragDrop<BudgetCategory[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+    const ordered = [...this.activeCategories];
+    moveItemInArray(ordered, event.previousIndex, event.currentIndex);
+    this.saveCategoryOrder(ordered.map(c => c.id));
+  }
 
   // Delete category confirmation
   deleteCategoryId = signal<string | null>(null);
@@ -211,8 +265,55 @@ export class BudgetComponent implements OnInit {
     return Math.min((cat.spent / cat.assigned) * 100, 100);
   }
 
-  getCategoryIcon(_name: string): string {
-    return '📁';
+  // ── Icono por categoría (lucide) ───────────────────────────────────────────
+  // Mapa { categoryId → nombre kebab del icono }, persistido en localStorage por
+  // ciclo. Se renderiza con <lucide-icon [img]="iconDataFor(id)">.
+  readonly iconGroups = CATEGORY_ICON_GROUPS;
+  private readonly categoryIcons = signal<Record<string, string>>({});
+  readonly iconPickerCategoryId = signal<string | null>(null);
+
+  private iconsStorageKey(): string | null {
+    const id = this.cycle()?.id;
+    return id ? `budget:catIcons:${id}` : null;
+  }
+
+  private loadCategoryIcons(): void {
+    const key = this.iconsStorageKey();
+    if (!key) { this.categoryIcons.set({}); return; }
+    try {
+      const raw = localStorage.getItem(key);
+      this.categoryIcons.set(raw ? JSON.parse(raw) : {});
+    } catch {
+      this.categoryIcons.set({});
+    }
+  }
+
+  iconDataFor(categoryId: string): LucideIconData {
+    return getCategoryIconData(this.categoryIcons()[categoryId]);
+  }
+
+  selectedIconName(categoryId: string): string {
+    return this.categoryIcons()[categoryId] ?? DEFAULT_CATEGORY_ICON;
+  }
+
+  openIconPicker(categoryId: string): void {
+    this.iconPickerCategoryId.set(categoryId);
+  }
+
+  closeIconPicker(): void {
+    this.iconPickerCategoryId.set(null);
+  }
+
+  selectIcon(name: string): void {
+    const id = this.iconPickerCategoryId();
+    if (!id) return;
+    const next = { ...this.categoryIcons(), [id]: name };
+    this.categoryIcons.set(next);
+    const key = this.iconsStorageKey();
+    if (key) {
+      try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* sin persistencia disponible */ }
+    }
+    this.closeIconPicker();
   }
 
   formatCurrency(amount: number): string {

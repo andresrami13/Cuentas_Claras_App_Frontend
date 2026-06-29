@@ -264,3 +264,19 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.25);
 }
+
+/* ── Drag & drop de categorías (Angular CDK) ──────────────────────────────────
+   Preview = clon que sigue al dedo; placeholder = hueco donde caerá la fila. */
+.cdk-drag-preview {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.cdk-drag-animating,
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}

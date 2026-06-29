@@ -386,18 +386,37 @@
               <div class="fixed inset-0 z-30" (click)="closeMenu()"></div>
             }
 
-            <!-- Categorías activas -->
+            <!-- Categorías activas (reordenables arrastrando el ⠿) -->
+            <div cdkDropList (cdkDropListDropped)="onCategoryDrop($event)">
             @for (cat of activeCategories; track cat.id) {
-              <div class="relative border-b border-veil/10">
+              <div cdkDrag class="relative border-b border-veil/10 bg-surface">
+                <!-- Handle de arrastre -->
+                <button
+                  cdkDragHandle
+                  (click)="$event.stopPropagation()"
+                  title="Arrastra para reordenar"
+                  class="absolute left-0.5 top-1/2 -translate-y-1/2 z-20 p-2 text-ink/25 hover:text-ink/60 cursor-grab active:cursor-grabbing touch-none"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
+                    <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+                    <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+                  </svg>
+                </button>
                 <!-- Área clickeable → abre modal de movimiento -->
                 <div
                   (click)="openTxForm(cat.id)"
-                  class="px-4 py-4 hover:bg-veil/5 active:bg-veil/10 transition-colors cursor-pointer"
+                  class="pl-9 pr-4 py-4 hover:bg-veil/5 active:bg-veil/10 transition-colors cursor-pointer"
                 >
                   <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-accent-400/10 flex items-center justify-center flex-shrink-0 text-lg">
-                      {{ getCategoryIcon(cat.name) }}
-                    </div>
+                    <button
+                      type="button"
+                      (click)="$event.stopPropagation(); openIconPicker(cat.id)"
+                      title="Cambiar icono"
+                      class="w-10 h-10 rounded-xl bg-accent-400/10 hover:bg-accent-400/20 text-accent-300 flex items-center justify-center flex-shrink-0 transition-colors"
+                    >
+                      <lucide-icon [img]="iconDataFor(cat.id)" class="w-5 h-5"></lucide-icon>
+                    </button>
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center justify-between mb-1.5">
                         <span class="text-sm font-semibold text-ink truncate">{{ cat.name }}</span>
@@ -466,6 +485,16 @@
                       </div>
                     </button>
                     <button
+                      (click)="openIconPicker(cat.id); closeMenu()"
+                      class="w-full flex items-center gap-3 px-4 py-3 text-sm text-ink/80 hover:bg-veil/10 hover:text-ink transition-colors text-left border-t border-veil/10"
+                    >
+                      <lucide-icon [img]="iconDataFor(cat.id)" class="w-4 h-4 text-accent-300"></lucide-icon>
+                      <div>
+                        <p class="font-medium">Cambiar icono</p>
+                        <p class="text-[11px] text-ink/40">Elige un icono para la categoría</p>
+                      </div>
+                    </button>
+                    <button
                       (click)="confirmDeleteCategory(cat.id); closeMenu()"
                       class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-300 hover:bg-red-400/15 transition-colors text-left border-t border-veil/10"
                     >
@@ -479,6 +508,7 @@
                 }
               </div>
             }
+            </div>
 
             <!-- Acordeón: categorías completadas -->
             @if (completedCategories.length > 0) {
@@ -508,8 +538,8 @@
                       class="px-4 py-4 cursor-pointer"
                     >
                       <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-veil/5 flex items-center justify-center flex-shrink-0 text-lg grayscale">
-                          {{ getCategoryIcon(cat.name) }}
+                        <div class="w-10 h-10 rounded-xl bg-veil/5 text-ink/50 flex items-center justify-center flex-shrink-0">
+                          <lucide-icon [img]="iconDataFor(cat.id)" class="w-5 h-5"></lucide-icon>
                         </div>
                         <div class="flex-1 min-w-0">
                           <div class="flex items-center justify-between mb-1.5">
@@ -849,6 +879,45 @@
             }
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: elegir icono de categoría ─────────────────────────────────── -->
+@if (iconPickerCategoryId(); as pickId) {
+  <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeIconPicker()"></div>
+    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-veil/20 md:border md:rounded-2xl w-full md:max-w-md rounded-t-3xl shadow-2xl z-10 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-veil/10 flex-shrink-0">
+        <h3 class="text-base font-bold text-ink">Elige un icono</h3>
+        <button (click)="closeIconPicker()" class="text-ink/40 hover:text-ink/70 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="px-5 py-4 space-y-4 overflow-y-auto">
+        @for (group of iconGroups; track group.group) {
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-ink/40 mb-2">{{ group.group }}</p>
+            <div class="grid grid-cols-6 gap-2">
+              @for (def of group.icons; track def.name) {
+                <button
+                  type="button"
+                  (click)="selectIcon(def.name)"
+                  [title]="def.label"
+                  class="aspect-square rounded-xl flex items-center justify-center border transition-colors"
+                  [ngClass]="selectedIconName(pickId) === def.name
+                    ? 'bg-accent-400/20 border-accent-400/60 text-accent-200'
+                    : 'bg-veil/10 border-veil/15 text-ink/70 hover:bg-veil/20'"
+                >
+                  <lucide-icon [img]="def.icon" class="w-5 h-5"></lucide-icon>
+                </button>
+              }
+            </div>
+          </div>
+        }
       </div>
     </div>
   </div>

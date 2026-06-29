@@ -14,6 +14,7 @@ export interface Transaction {
   amount: number;
   date: string;
   budgetCategoryId: number | null;
+  accountId: number | null;
   categoryName: string;
   description?: string;
   createdAt: string;
@@ -24,6 +25,7 @@ export interface TransactionForm {
   amount: number | null;
   date: string;
   budgetCategoryId: number | null;
+  accountId: number | null;
   incomeType: string;
   description: string;
 }
@@ -31,6 +33,7 @@ export interface TransactionForm {
 export interface TransactionFilter {
   type: TransactionType | 'all';
   budgetCategoryId: number | 'all';
+  accountId: number | 'all';
   dateFrom: string;
   dateTo: string;
 }

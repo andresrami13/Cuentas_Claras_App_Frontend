@@ -15,11 +15,13 @@ interface FinancialRecordDto {
   userDocumentNumber?: string;
   recordType?: string;
   budgetCategoryId?: number;
+  accountId?: number;
   description?: string;
   amount?: number;
   recordDate?: string;
   recurring?: boolean;
   periodicity?: string;
+  createdAt?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -64,11 +66,12 @@ export class TransactionService {
       amount: dto.amount ?? 0,
       date: dto.recordDate ?? '',
       budgetCategoryId: dto.budgetCategoryId ?? null,
+      accountId: dto.accountId ?? null,
       categoryName: isIncome
         ? (dto.description ?? 'Ingreso')
         : (budgetCategory?.name ?? 'Sin categoría'),
       description: isIncome ? undefined : (dto.description || undefined),
-      createdAt: dto.recordDate ?? '',
+      createdAt: dto.createdAt ?? dto.recordDate ?? '',
     };
   }
 
@@ -91,7 +94,8 @@ export class TransactionService {
     const endpoint = isExpense ? 'expenses' : 'incomes';
     const body: FinancialRecordDto = {
       userDocumentNumber: this.documentNumber,
-      budgetCategoryId: isExpense ? form.budgetCategoryId! : undefined,
+      budgetCategoryId: isExpense ? (form.budgetCategoryId ?? undefined) : undefined,
+      accountId: form.accountId ?? undefined,
       description: isExpense ? (form.description || undefined) : form.incomeType,
       amount: form.amount!,
       recordDate: form.date,
@@ -110,7 +114,8 @@ export class TransactionService {
     const body: FinancialRecordDto = {
       userDocumentNumber: this.documentNumber,
       recordType: isExpense ? 'EXPENSE' : 'INCOME',
-      budgetCategoryId: isExpense ? form.budgetCategoryId! : undefined,
+      budgetCategoryId: isExpense ? (form.budgetCategoryId ?? undefined) : undefined,
+      accountId: form.accountId ?? undefined,
       description: isExpense ? (form.description || undefined) : form.incomeType,
       amount: form.amount!,
       recordDate: form.date,
@@ -138,10 +143,17 @@ export class TransactionService {
     return this._transactions().filter(t => {
       if (filters.type !== 'all' && t.type !== filters.type) return false;
       if (filters.budgetCategoryId !== 'all' && t.budgetCategoryId !== filters.budgetCategoryId) return false;
+      if (filters.accountId !== 'all' && t.accountId !== filters.accountId) return false;
       if (filters.dateFrom && t.date < filters.dateFrom) return false;
       if (filters.dateTo && t.date > filters.dateTo) return false;
       return true;
-    }).sort((a, b) => b.date.localeCompare(a.date));
+    }).sort((a, b) => this.sortKey(b).localeCompare(this.sortKey(a)));
+  }
+
+  // Ordena por fecha y, dentro del mismo día, por hora de creación (createdAt).
+  private sortKey(t: Transaction): string {
+    const time = t.createdAt && t.createdAt.includes('T') ? t.createdAt.substring(11) : '';
+    return `${t.date}T${time}`;
   }
 
   getByMonth(): { month: string; income: number; expenses: number }[] {
