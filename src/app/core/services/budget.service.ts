@@ -47,19 +47,6 @@ interface UserBudgetConfigDto {
   fixedCategories?: FixedBudgetCategoryDto[];
 }
 
-// ── Date helper ───────────────────────────────────────────────────────────────
-
-function calcNextPayDate(payDay: number, cycleStartDate: string): string {
-  const start = new Date(cycleStartDate + 'T00:00:00');
-  const nextYear = start.getMonth() === 11 ? start.getFullYear() + 1 : start.getFullYear();
-  const nextMonth = (start.getMonth() + 1) % 12;
-  const lastDay = new Date(nextYear, nextMonth + 1, 0).getDate();
-  const day = Math.min(payDay, lastDay);
-  return `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
 function toCategory(dto: BudgetCategoryDto): BudgetCategory {
   const assigned = dto.assignedAmount ?? 0;
   const spent = dto.spentAmount ?? 0;
@@ -211,22 +198,36 @@ export class BudgetService {
     } : c);
   }
 
-  async autoCreateCycle(): Promise<void> {
+  // Cierra (archiva) un ciclo cambiando su estado ACTIVE → CLOSED.
+  // Contrato backend: PUT /budget-cycles/{id}  body { paymentDay, periodicity, status: 'CLOSED' }
+  async closeCycle(cycleId: string, paymentDay: number, periodicity: Periodicity): Promise<void> {
+    const body = { paymentDay, periodicity, status: 'CLOSED' };
+    await lastValueFrom(
+      this.http.put<ApiResponse<BudgetCycleDto>>(
+        `${API}/budget-cycles/${cycleId}`, body
+      ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
+    );
+  }
+
+  // Disparo manual del ciclo: el usuario lo llama cuando recibe su pago.
+  // 1) Cierra el ciclo activo actual (si existe) para no dejar dos activos.
+  // 2) Crea el nuevo ciclo — createCycle deja su id en _cycle.
+  // 3) Copia las categorías fijas dentro del NUEVO ciclo (necesitan su id).
+  async startNewCycle(): Promise<void> {
     const config = this._config();
     if (!config) throw new Error('No hay configuración de presupuesto');
 
     this._loading.set(true);
     try {
+      const current = this._cycle();
+      if (current && current.status === 'active') {
+        await this.closeCycle(current.id, config.payDay, config.periodicity);
+      }
+
       await this.createCycle({ paymentDay: config.payDay, periodicity: config.periodicity });
 
       for (const fc of config.fixedCategories) {
         await this.addCategory({ name: fc.name, assigned: fc.amount });
-      }
-
-      const cycleStart = this._cycle()?.startDate;
-      if (cycleStart) {
-        const newNextPayDate = calcNextPayDate(config.payDay, cycleStart);
-        await this.saveConfig({ ...config, nextPayDate: newNextPayDate });
       }
     } finally {
       this._loading.set(false);

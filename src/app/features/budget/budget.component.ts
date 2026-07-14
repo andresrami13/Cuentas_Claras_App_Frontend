@@ -11,7 +11,7 @@ import { FabMenuComponent, FabAction } from '../../shared/components/fab-menu/fa
 import { BudgetService } from '../../core/services/budget.service';
 import { TransactionService } from '../../core/services/transaction.service';
 import { AuthService } from '../../core/services/auth.service';
-import { BudgetCategory, CreateCycleForm, AddCategoryForm, Periodicity, PERIODICITY_LABELS } from '../../core/models/budget.model';
+import { BudgetCategory, AddCategoryForm } from '../../core/models/budget.model';
 import { TransactionForm, INCOME_TYPES } from '../../core/models/transaction.model';
 
 const EMPTY_TX_FORM: TransactionForm = {
@@ -69,14 +69,12 @@ export class BudgetComponent implements OnInit {
   }
 
   readonly guideSteps = [
-    'Configura tu día de pago en el botón de configuración (⚙️). Cuando llegue esa fecha, tu ciclo se crea solo con tus categorías fijas.',
+    'Configura tu día de pago y tus categorías fijas en el botón de configuración (⚙️). Cuando recibas tu pago, pulsa "Iniciar ciclo" y se creará el ciclo con esas categorías.',
     'Crea categorías con un monto asignado: Mercado, Transporte, Arriendo... piensa en ellas como sobres donde repartes tu plata.',
     'Registra cada gasto con "Nuevo movimiento" eligiendo su categoría: la barra te muestra cuánto llevas gastado y cuánto te queda en cada sobre.',
     'Usa el botón 📈 para proyectar tu próximo mes: simula cuánto recibirás y gastarás antes de que llegue.',
   ];
 
-  readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
-  readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
   readonly INCOME_TYPES = INCOME_TYPES;
 
   // Menú desplegable del engranaje (configuración / proyección / ayuda)
@@ -94,16 +92,10 @@ export class BudgetComponent implements OnInit {
     else if (id === 'category') this.openAddCategory();
   }
 
-  // Auto-creation state
-  autoCreating = signal(false);
-  autoCreated = signal(false);
-  autoCreateError = signal<string | null>(null);
-
-  // Manual cycle creation (fallback si auto-creación falla)
-  showCreateForm = signal(false);
-  createForm: CreateCycleForm = { paymentDay: 15, periodicity: 'MONTHLY' };
-  createLoading = signal(false);
-  createError = signal<string | null>(null);
+  // Disparo manual del ciclo ("Iniciar ciclo")
+  startingCycle = signal(false);
+  startError = signal<string | null>(null);
+  showStartConfirm = signal(false); // confirmación cuando ya hay un ciclo activo
 
   // Add / edit category modal
   showCategoryForm = signal(false);
@@ -125,34 +117,12 @@ export class BudgetComponent implements OnInit {
     return this.budgetCategories.find(c => +c.id === id) ?? null;
   }
 
-  readonly isLoadingAny = computed(() => this.loading() || this.autoCreating());
+  readonly isLoadingAny = computed(() => this.loading() || this.startingCycle());
 
   async ngOnInit(): Promise<void> {
     await this.budgetService.loadConfig();
     await this.budgetService.loadActiveCycle();
     await this.txService.loadAll();
-
-    if (!this.budgetService.cycle()) {
-      const config = this.budgetService.config();
-      if (config?.payDay) {
-        const today = new Date().toISOString().split('T')[0];
-        const nextPay = config.nextPayDate || today;
-        if (today >= nextPay) {
-          this.autoCreating.set(true);
-          try {
-            await this.budgetService.autoCreateCycle();
-            this.autoCreated.set(true);
-            setTimeout(() => this.autoCreated.set(false), 5000);
-          } catch (err: unknown) {
-            this.autoCreateError.set(
-              err instanceof Error ? err.message : 'No se pudo crear el ciclo automáticamente'
-            );
-          } finally {
-            this.autoCreating.set(false);
-          }
-        }
-      }
-    }
 
     this.loadCategoryOrder();
     this.loadCategoryIcons();
@@ -164,22 +134,9 @@ export class BudgetComponent implements OnInit {
     return !!this.budgetService.config()?.payDay;
   }
 
-  get nextCycleNotStarted(): boolean {
-    const cfg = this.budgetService.config();
-    if (!cfg?.nextPayDate) return false;
-    return new Date().toISOString().split('T')[0] < cfg.nextPayDate;
-  }
-
-  get nextPayDateDisplay(): string {
-    return this.formatDate(this.budgetService.config()?.nextPayDate ?? '');
-  }
-
-  get currentCycleMonthName(): string {
-    const start = this.cycle()?.startDate;
-    if (!start) return '';
-    const [y, m] = start.split('-');
-    return new Date(Number(y), Number(m) - 1, 1)
-      .toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+  // Nº de categorías fijas configuradas — se usa para anticipar qué traerá el ciclo.
+  get fixedCategoriesCount(): number {
+    return this.budgetService.config()?.fixedCategories.length ?? 0;
   }
 
   get budgetCategories(): BudgetCategory[] {
@@ -405,34 +362,36 @@ export class BudgetComponent implements OnInit {
     }
   }
 
-  // ── Manual cycle creation (fallback) ──────────────────────────────────────
+  // ── Disparo manual del ciclo ("Iniciar ciclo") ─────────────────────────────
 
-  openCreateForm(): void {
-    const cfg = this.budgetService.config();
-    this.createForm = {
-      paymentDay: cfg?.payDay ?? 15,
-      periodicity: cfg?.periodicity ?? 'MONTHLY',
-    };
-    this.createError.set(null);
-    this.showCreateForm.set(true);
+  // Punto de entrada desde los botones. Si ya hay un ciclo activo, pide
+  // confirmación (iniciar uno nuevo cierra el actual); si no, arranca directo.
+  onStartCycleClick(): void {
+    this.startError.set(null);
+    if (this.cycle()) {
+      this.showStartConfirm.set(true);
+    } else {
+      this.startCycle();
+    }
   }
 
-  closeCreateForm(): void {
-    this.showCreateForm.set(false);
-    this.createError.set(null);
+  cancelStartCycle(): void {
+    this.showStartConfirm.set(false);
   }
 
-  async submitCreateCycle(): Promise<void> {
-    if (!this.createForm.paymentDay || !this.createForm.periodicity) return;
-    this.createLoading.set(true);
-    this.createError.set(null);
+  async startCycle(): Promise<void> {
+    this.startingCycle.set(true);
+    this.startError.set(null);
     try {
-      await this.budgetService.createCycle(this.createForm);
-      this.showCreateForm.set(false);
+      await this.budgetService.startNewCycle();
+      this.showStartConfirm.set(false);
+      // El nuevo ciclo tiene otro id: recarga el orden e iconos guardados por ciclo.
+      this.loadCategoryOrder();
+      this.loadCategoryIcons();
     } catch (err: unknown) {
-      this.createError.set(err instanceof Error ? err.message : 'Error al crear el ciclo');
+      this.startError.set(err instanceof Error ? err.message : 'No se pudo iniciar el ciclo');
     } finally {
-      this.createLoading.set(false);
+      this.startingCycle.set(false);
     }
   }
 

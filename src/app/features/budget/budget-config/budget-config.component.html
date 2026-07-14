@@ -49,16 +49,8 @@
         </select>
       </div>
       <div class="sm:col-span-2">
-        <label class="block text-sm font-medium text-ink/80 mb-1.5">
-          Inicio del próximo ciclo
-        </label>
-        <input
-          type="date"
-          [(ngModel)]="nextPayDate"
-          class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors"
-        >
-        <p class="text-xs text-ink/50 mt-1.5 leading-snug">
-          El ciclo se crea automáticamente desde esta fecha. Si este mes te pagan en un día diferente al habitual, ajústala aquí antes de que termine el ciclo actual.
+        <p class="text-xs text-ink/50 leading-snug">
+          Estos datos definen la duración de cada ciclo. El ciclo <span class="font-medium text-ink/70">no se crea solo</span>: cuando recibas tu pago, pulsa <span class="font-medium text-ink/70">“Iniciar ciclo”</span> en Presupuesto y se creará con tus categorías fijas.
         </p>
       </div>
     </div>
@@ -157,7 +149,7 @@
   <!-- Save button -->
   <button
     (click)="save()"
-    [disabled]="!payDay || !nextPayDate || !periodicity || saveLoading()"
+    [disabled]="!payDay || !periodicity || saveLoading()"
     class="w-full py-3.5 rounded-xl text-sm font-bold text-on-accent bg-accent-400/80 hover:bg-accent-300/90 backdrop-blur-sm transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-95"
   >
     @if (saveLoading()) {

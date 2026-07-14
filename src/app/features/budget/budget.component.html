@@ -1,13 +1,3 @@
-<!-- ── Toast: ciclo creado automáticamente ───────────────────────────────── -->
-@if (autoCreated()) {
-  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-400 text-on-accent text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 whitespace-nowrap">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-    </svg>
-    Ciclo de {{ currentCycleMonthName }} creado automáticamente
-  </div>
-}
-
 <div class="p-4 md:p-6 max-w-4xl mx-auto">
 
   <!-- Header -->
@@ -35,6 +25,18 @@
         @if (headerMenuOpen()) {
           <div class="fixed inset-0 z-30" (click)="headerMenuOpen.set(false)"></div>
           <div class="absolute right-0 top-full mt-2 z-40 w-56 bg-surface border border-veil/15 rounded-xl shadow-2xl overflow-hidden menu-pop origin-top-right">
+            @if (hasConfig) {
+              <button
+                (click)="onStartCycleClick(); headerMenuOpen.set(false)"
+                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-ink/80 hover:bg-veil/10 hover:text-ink transition-colors text-left border-b border-veil/10"
+              >
+                <span class="text-base">🔄</span>
+                <div>
+                  <p class="font-medium">{{ cycle() ? 'Iniciar nuevo ciclo' : 'Iniciar ciclo' }}</p>
+                  <p class="text-[11px] text-ink/40">{{ cycle() ? 'Cierra el actual y empieza otro' : 'Empieza tu ciclo con tus categorías fijas' }}</p>
+                </div>
+              </button>
+            }
             <button
               (click)="goToConfig(); headerMenuOpen.set(false)"
               class="w-full flex items-center gap-3 px-4 py-3 text-sm text-ink/80 hover:bg-veil/10 hover:text-ink transition-colors text-left"
@@ -99,8 +101,8 @@
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      @if (autoCreating()) {
-        <p class="text-sm text-ink/70 font-medium">Preparando tu ciclo...</p>
+      @if (startingCycle()) {
+        <p class="text-sm text-ink/70 font-medium">Iniciando tu ciclo...</p>
       }
     </div>
   }
@@ -130,25 +132,36 @@
       </div>
     }
 
-    <!-- ── Estado 2: configurado pero aún no es fecha de pago ─────────────── -->
-    @if (!cycle() && hasConfig && nextCycleNotStarted) {
+    <!-- ── Estado 2: configurado, sin ciclo activo → listo para iniciar ────── -->
+    @if (!cycle() && hasConfig) {
       <div class="flex flex-col items-center justify-center py-16 text-center px-4">
-        <div class="w-20 h-20 rounded-2xl bg-blue-400/10 flex items-center justify-center text-4xl mb-5">
-          📅
+        <div class="w-20 h-20 rounded-2xl bg-accent-400/10 flex items-center justify-center text-4xl mb-5">
+          💰
         </div>
-        <h2 class="text-lg font-bold text-ink mb-2">Tu próximo ciclo comienza el</h2>
-        <p class="text-3xl font-bold text-accent-300 mb-3">{{ nextPayDateDisplay }}</p>
+        <h2 class="text-lg font-bold text-ink mb-2">Todo listo para tu ciclo</h2>
         <p class="text-sm text-ink/70 max-w-xs mb-6">
-          El ciclo se creará automáticamente cuando llegue esa fecha. Si necesitas ajustarla, puedes hacerlo en configuración.
+          Cuando recibas tu pago, inicia el ciclo: se crearán tus
+          @if (fixedCategoriesCount > 0) {
+            <span class="font-semibold text-ink">{{ fixedCategoriesCount }}</span> categorías fijas automáticamente.
+          } @else {
+            categorías fijas automáticamente.
+          }
         </p>
+
+        @if (startError()) {
+          <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl mb-4 max-w-xs">
+            {{ startError() }}
+          </div>
+        }
+
         <button
-          (click)="goToProjection()"
+          (click)="onStartCycleClick()"
           class="flex items-center gap-2 bg-accent-400/80 hover:bg-accent-300/90 text-on-accent font-semibold text-sm px-6 py-3 rounded-xl backdrop-blur-sm transition-all duration-200 active:scale-95 mb-3"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
-          Proyectar ese ciclo
+          Iniciar ciclo ahora
         </button>
         <button
           (click)="goToConfig()"
@@ -158,33 +171,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
-          Ajustar fecha
+          Ajustar configuración
         </button>
-      </div>
-    }
-
-    <!-- ── Estado 3: auto-creación falló (fallback manual) ─────────────────── -->
-    @if (!cycle() && hasConfig && !nextCycleNotStarted && autoCreateError()) {
-      <div class="flex flex-col items-center justify-center py-16 text-center px-4">
-        <div class="w-20 h-20 rounded-2xl bg-red-400/10 flex items-center justify-center text-4xl mb-5">
-          ⚠️
-        </div>
-        <h2 class="text-lg font-bold text-ink mb-2">No se pudo crear el ciclo</h2>
-        <p class="text-sm text-red-300 max-w-xs mb-6">{{ autoCreateError() }}</p>
-        <div class="flex flex-col sm:flex-row gap-3">
-          <button
-            (click)="openCreateForm()"
-            class="flex items-center justify-center gap-2 bg-accent-400/80 hover:bg-accent-300/90 text-on-accent font-semibold text-sm px-6 py-3 rounded-xl transition-all duration-200 active:scale-95"
-          >
-            Crear ciclo manualmente
-          </button>
-          <button
-            (click)="goToConfig()"
-            class="flex items-center justify-center gap-2 bg-veil/10 hover:bg-veil/20 border border-veil/20 text-ink font-medium text-sm px-6 py-3 rounded-xl transition-all duration-200 active:scale-95"
-          >
-            Configuración
-          </button>
-        </div>
       </div>
     }
 
@@ -762,56 +750,45 @@
   </div>
 }
 
-<!-- ── Modal: crear ciclo manualmente (fallback) ─────────────────────────── -->
-@if (showCreateForm()) {
-  <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeCreateForm()"></div>
-    <div class="relative bg-surface/80 backdrop-blur-xl border-t border-veil/20 md:border md:rounded-2xl w-full md:max-w-md rounded-t-3xl shadow-2xl z-10">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-veil/10">
-        <h3 class="text-base font-bold text-ink">Crear ciclo manualmente</h3>
-        <button (click)="closeCreateForm()" class="text-ink/40 hover:text-ink/70 p-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <div class="px-5 py-4 space-y-4">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-ink/80 mb-1.5">Día de pago</label>
-            <input type="number" [(ngModel)]="createForm.paymentDay" min="1" max="31"
-              class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink placeholder:text-ink/40 focus:border-accent-400/60 focus:outline-none transition-colors"
-              placeholder="15">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-ink/80 mb-1.5">Periodicidad</label>
-            <select [(ngModel)]="createForm.periodicity"
-              class="block w-full px-3 py-3 bg-veil/10 border border-veil/25 rounded-xl text-ink focus:border-accent-400/60 focus:outline-none transition-colors">
-              @for (p of periodicityOptions; track p) {
-                <option [value]="p" class="bg-surface">{{ PERIODICITY_LABELS[p] }}</option>
-              }
-            </select>
-          </div>
+<!-- ── Modal: confirmar iniciar nuevo ciclo (cuando ya hay uno activo) ────── -->
+@if (showStartConfirm()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="cancelStartCycle()"></div>
+    <div class="relative bg-surface/80 backdrop-blur-xl border border-veil/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full z-10">
+      <div class="text-center">
+        <div class="w-14 h-14 rounded-2xl bg-accent-400/15 flex items-center justify-center mx-auto mb-4 text-2xl">
+          🔄
         </div>
-        @if (createError()) {
-          <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl">{{ createError() }}</div>
+        <h3 class="font-bold text-ink text-base mb-1">¿Iniciar un nuevo ciclo?</h3>
+        <p class="text-sm text-ink/60 mb-5">
+          Tu ciclo activo se cerrará y se creará uno nuevo con tus
+          @if (fixedCategoriesCount > 0) {
+            <span class="font-semibold text-ink">{{ fixedCategoriesCount }}</span> categorías fijas.
+          } @else {
+            categorías fijas.
+          }
+          Los movimientos del ciclo anterior quedan en su historial.
+        </p>
+        @if (startError()) {
+          <div class="bg-red-500/20 border border-red-400/30 text-red-300 text-sm px-3 py-2.5 rounded-xl mb-4">{{ startError() }}</div>
         }
-        <div class="flex gap-3 pb-2">
-          <button type="button" (click)="closeCreateForm()"
-            class="flex-1 py-3 bg-veil/10 hover:bg-veil/20 border border-veil/20 rounded-xl text-sm font-semibold text-ink transition-all duration-200 active:scale-95">
+        <div class="flex gap-3">
+          <button (click)="cancelStartCycle()"
+            [disabled]="startingCycle()"
+            class="flex-1 py-2.5 bg-veil/10 hover:bg-veil/20 border border-veil/20 rounded-xl text-sm font-semibold text-ink transition-all duration-200 active:scale-95 disabled:opacity-50">
             Cancelar
           </button>
-          <button type="button" (click)="submitCreateCycle()"
-            [disabled]="!createForm.paymentDay || !createForm.periodicity || createLoading()"
-            class="flex-1 py-3 rounded-xl text-sm font-bold text-on-accent bg-accent-400/80 hover:bg-accent-300/90 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 active:scale-95">
-            @if (createLoading()) {
+          <button (click)="startCycle()"
+            [disabled]="startingCycle()"
+            class="flex-1 py-2.5 rounded-xl text-sm font-bold text-on-accent bg-accent-400/80 hover:bg-accent-300/90 transition-all duration-200 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+            @if (startingCycle()) {
               <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Creando...
+              Iniciando...
             } @else {
-              Crear ciclo
+              Iniciar ciclo
             }
           </button>
         </div>

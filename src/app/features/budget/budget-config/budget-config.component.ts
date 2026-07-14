@@ -70,7 +70,7 @@ export class BudgetConfigComponent implements OnInit {
   }
 
   async save(): Promise<void> {
-    if (!this.payDay || !this.nextPayDate || !this.periodicity) return;
+    if (!this.payDay || !this.periodicity) return;
     this.saveLoading.set(true);
     this.saveError.set(null);
     try {
@@ -78,7 +78,8 @@ export class BudgetConfigComponent implements OnInit {
         documentNumber: '',
         payDay: this.payDay,
         periodicity: this.periodicity,
-        nextPayDate: this.nextPayDate,
+        // El ciclo se dispara manualmente; conservamos la fecha si venía del backend.
+        nextPayDate: this.nextPayDate || new Date().toISOString().split('T')[0],
         fixedCategories: this.fixedCategories,
       });
       await this.budgetService.syncCycleWithConfig();
