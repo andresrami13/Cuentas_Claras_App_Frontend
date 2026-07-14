@@ -16,6 +16,21 @@
     </div>
   </div>
 
+  <!-- Ciclo activo (informativo) -->
+  @if (cycle(); as c) {
+    <div class="bg-veil/15 backdrop-blur-md border border-veil/25 rounded-2xl px-5 py-4 mb-4 flex items-center justify-between">
+      <div>
+        <p class="text-xs text-ink/50 font-medium mb-0.5">Ciclo activo</p>
+        <p class="text-ink font-bold text-base">
+          {{ formatDate(c.startDate) }} → {{ formatDate(c.endDate) }}
+        </p>
+      </div>
+      <span class="text-xs bg-emerald-400/20 text-emerald-300 font-bold px-2.5 py-1 rounded-full border border-emerald-400/30">
+        Activo
+      </span>
+    </div>
+  }
+
   <!-- Pay cycle card -->
   <div class="bg-veil/10 backdrop-blur-md border border-veil/15 rounded-2xl p-5 mb-4">
     <div class="flex items-center gap-2 mb-4">

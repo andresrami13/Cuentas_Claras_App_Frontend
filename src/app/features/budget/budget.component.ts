@@ -291,12 +291,6 @@ export class BudgetComponent implements OnInit {
     return `${prefix}${abs.toFixed(0)}`;
   }
 
-  formatDate(date: string): string {
-    if (!date) return '';
-    const [y, m, d] = date.split('-');
-    return `${d}/${m}/${y}`;
-  }
-
   // ── New transaction modal ──────────────────────────────────────────────────
 
   openTxForm(categoryId?: string | null, type: 'expense' | 'income' = 'expense'): void {

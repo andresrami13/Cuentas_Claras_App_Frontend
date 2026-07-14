@@ -17,6 +17,9 @@ export class BudgetConfigComponent implements OnInit {
   readonly PERIODICITY_LABELS = PERIODICITY_LABELS;
   readonly periodicityOptions: Periodicity[] = ['WEEKLY', 'BIWEEKLY', 'MONTHLY'];
 
+  // Ciclo activo (si lo hay): se muestra como tarjeta informativa aquí.
+  readonly cycle = this.budgetService.cycle;
+
   payDay = 15;
   periodicity: Periodicity = 'MONTHLY';
   nextPayDate = '';
@@ -45,6 +48,15 @@ export class BudgetConfigComponent implements OnInit {
     if (!this.budgetService.config()) {
       await this.budgetService.loadConfig();
     }
+    if (!this.budgetService.cycle()) {
+      await this.budgetService.loadActiveCycle();
+    }
+  }
+
+  formatDate(date: string): string {
+    if (!date) return '';
+    const [y, m, d] = date.split('-');
+    return `${d}/${m}/${y}`;
   }
 
   addFixedCategory(): void {

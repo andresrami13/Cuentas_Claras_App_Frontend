@@ -179,19 +179,6 @@
     <!-- ── Estado 4: ciclo activo ──────────────────────────────────────────── -->
     @if (cycle(); as c) {
 
-      <!-- Banner del ciclo -->
-      <div class="bg-veil/15 backdrop-blur-md border border-veil/25 rounded-2xl px-5 py-4 mb-5 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-ink/50 font-medium mb-0.5">Ciclo activo</p>
-          <p class="text-ink font-bold text-base">
-            {{ formatDate(c.startDate) }} → {{ formatDate(c.endDate) }}
-          </p>
-        </div>
-        <span class="text-xs bg-emerald-400/20 text-emerald-300 font-bold px-2.5 py-1 rounded-full border border-emerald-400/30">
-          Activo
-        </span>
-      </div>
-
       <!-- ── Plantillas de las caras de resumen (reutilizadas en flip móvil y en escritorio) ── -->
 
       <!-- Balance -->
