@@ -199,12 +199,13 @@ export class BudgetService {
   }
 
   // Cierra (archiva) un ciclo cambiando su estado ACTIVE → CLOSED.
-  // Contrato backend: PUT /budget-cycles/{id}  body { paymentDay, periodicity, status: 'CLOSED' }
-  async closeCycle(cycleId: string, paymentDay: number, periodicity: Periodicity): Promise<void> {
-    const body = { paymentDay, periodicity, status: 'CLOSED' };
+  // Contrato backend: PATCH /budget-cycles/{id}/close  (sin body).
+  // Ojo: PUT /budget-cycles/{id} es el endpoint de ACTUALIZAR e ignora `status`,
+  // por eso no sirve para cerrar el ciclo.
+  async closeCycle(cycleId: string): Promise<void> {
     await lastValueFrom(
-      this.http.put<ApiResponse<BudgetCycleDto>>(
-        `${API}/budget-cycles/${cycleId}`, body
+      this.http.patch<ApiResponse<BudgetCycleDto>>(
+        `${API}/budget-cycles/${cycleId}/close`, {}
       ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
     );
   }
@@ -221,7 +222,7 @@ export class BudgetService {
     try {
       const current = this._cycle();
       if (current && current.status === 'active') {
-        await this.closeCycle(current.id, config.payDay, config.periodicity);
+        await this.closeCycle(current.id);
       }
 
       await this.createCycle({ paymentDay: config.payDay, periodicity: config.periodicity });
