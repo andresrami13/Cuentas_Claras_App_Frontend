@@ -16,6 +16,7 @@ interface FinancialRecordDto {
   recordType?: string;
   budgetCategoryId?: number;
   accountId?: number;
+  budgetCycleId?: number;   // solo lectura: el backend lo estampa con el ciclo activo
   description?: string;
   amount?: number;
   recordDate?: string;
@@ -75,12 +76,26 @@ export class TransactionService {
     };
   }
 
+  // Carga solo los movimientos del ciclo ACTIVO, no el histórico completo. Así
+  // Ingresos/Egresos/Balance arrancan en 0 al iniciar un ciclo nuevo.
   async loadAll(): Promise<void> {
+    // Aseguramos tener el ciclo activo, sin depender del orden de las llamadas.
+    if (!this.budgetSvc.cycle()) {
+      await this.budgetSvc.loadActiveCycle();
+    }
+    const cycleId = this.budgetSvc.cycle()?.id;
+
+    // Sin ciclo activo → no hay movimientos que mostrar; balances en 0.
+    if (!cycleId) {
+      this._transactions.set([]);
+      return;
+    }
+
     this._loading.set(true);
     try {
       const res = await lastValueFrom(
         this.http.get<ApiResponse<FinancialRecordDto[]>>(
-          `${API}/financial-records/users/${this.documentNumber}`
+          `${API}/financial-records/cycles/${cycleId}`
         ).pipe(catchError((err: HttpErrorResponse) => this.handleError(err)))
       );
       this._transactions.set((res.data ?? []).map(dto => this.toTransaction(dto)));

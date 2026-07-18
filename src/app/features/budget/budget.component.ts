@@ -379,7 +379,9 @@ export class BudgetComponent implements OnInit {
     try {
       await this.budgetService.startNewCycle();
       this.showStartConfirm.set(false);
-      // El nuevo ciclo tiene otro id: recarga el orden e iconos guardados por ciclo.
+      // El nuevo ciclo tiene otro id: recarga movimientos (arrancan en 0),
+      // más el orden e iconos guardados por ciclo.
+      await this.txService.loadAll();
       this.loadCategoryOrder();
       this.loadCategoryIcons();
     } catch (err: unknown) {
